@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -17,15 +18,18 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
 
-import org.zafritech.zscode.todos.enums.Frequency;
+import org.zafritech.zscode.todos.enums.Priority;
+import org.zafritech.zscode.todos.enums.RepeatType;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
-@Entity(name = "ZSCODE_TODOS_TODOS")
-public class Todo implements Serializable {
+@Entity(name = "ZSCODE_TODOS_TASKS")
+public class Task implements Serializable {
 
 	private static final long serialVersionUID = -5715371767694860756L;
 
@@ -35,31 +39,30 @@ public class Todo implements Serializable {
     
     private String uuId;
 
-    private String name;
-
+    @NotNull
+    @Column(columnDefinition = "TEXT")
     private String details;
 
-    private boolean recurring;
+    @Enumerated(EnumType.STRING)
+    private RepeatType repeatType;
 
     @Enumerated(EnumType.STRING)
-    private Frequency frequency;
-    
+    private Priority priority;
+
+    @ManyToOne
+    @JoinColumn(name = "categoryId")
     private Category category;
+    
+    private boolean complete;
+
+    @ManyToOne
+    @JoinColumn(name = "projectId")
+    private Project project;
 
     @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-    @JoinTable(name = "ZSCODE_TODOS_TODOPROJECTS",
+    @JoinTable(name = "ZSCODE_TODOS_TASKSTAGS",
             joinColumns = {
-                @JoinColumn(name = "todoId", referencedColumnName = "id")},
-            inverseJoinColumns = {
-                @JoinColumn(name = "projectId", referencedColumnName = "id")}
-    )
-    @JsonBackReference
-    private Set<Project> projects = new HashSet<Project>();
-
-    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-    @JoinTable(name = "ZSCODE_TODOS_TODOTAGS",
-            joinColumns = {
-                @JoinColumn(name = "todoId", referencedColumnName = "id")},
+                @JoinColumn(name = "taskId", referencedColumnName = "id")},
             inverseJoinColumns = {
                 @JoinColumn(name = "tagId", referencedColumnName = "id")}
     )
@@ -70,33 +73,34 @@ public class Todo implements Serializable {
     private Date creationDate;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private Date dueDate;
+    private Date due;
 
-	public Todo() {
+	public Task() {
 
 	}
 
-	public Todo(String name, String details) {
+	public Task(String details) {
 	
 		this.uuId = UUID.randomUUID().toString();
-		this.name = name;
 		this.details = details;
-		this.recurring = false;
-		this.frequency = null;
+		this.repeatType = RepeatType.ONCE_OFF;
+		this.priority = Priority.MEDIUM;
 		this.category = null;
+		this.complete = false;
 		this.creationDate = new Timestamp(System.currentTimeMillis());
+		this.due = new Timestamp(System.currentTimeMillis());;
 	}
 
-	public Todo(String name, String details, Date due) {
+	public Task(String details, Date due) {
 	
 		this.uuId = UUID.randomUUID().toString();
-		this.name = name;
 		this.details = details;
-		this.recurring = false;
-		this.frequency = null;
+		this.repeatType = RepeatType.ONCE_OFF;
+		this.priority = Priority.MEDIUM;
 		this.category = null;
+		this.complete = false;
 		this.creationDate = new Timestamp(System.currentTimeMillis());
-		this.dueDate = due;
+		this.due = due;
 	}
 
 	public String getUuId() {
@@ -107,14 +111,6 @@ public class Todo implements Serializable {
 		this.uuId = uuId;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public String getDetails() {
 		return details;
 	}
@@ -123,36 +119,44 @@ public class Todo implements Serializable {
 		this.details = details;
 	}
 
-	public boolean isRecurring() {
-		return recurring;
+	public RepeatType getRepeatType() {
+		return repeatType;
 	}
 
-	public void setRecurring(boolean recurring) {
-		this.recurring = recurring;
+	public void setRepeatType(RepeatType repeatType) {
+		this.repeatType = repeatType;
 	}
 
-	public Frequency getFrequency() {
-		return frequency;
+	public Priority getPriority() {
+		return priority;
 	}
 
-	public void setFrequency(Frequency frequency) {
-		this.frequency = frequency;
+	public void setPriority(Priority priority) {
+		this.priority = priority;
 	}
 
 	public Category getCategory() {
 		return category;
 	}
 
+	public boolean isComplete() {
+		return complete;
+	}
+
+	public void setComplete(boolean complete) {
+		this.complete = complete;
+	}
+
 	public void setCategory(Category category) {
 		this.category = category;
 	}
 
-	public Set<Project> getProjects() {
-		return projects;
+	public Project getProject() {
+		return project;
 	}
 
-	public void setProjects(Set<Project> projects) {
-		this.projects = projects;
+	public void setProject(Project project) {
+		this.project = project;
 	}
 
 	public Set<Tag> getTags() {
@@ -171,12 +175,12 @@ public class Todo implements Serializable {
 		this.creationDate = creationDate;
 	}
 
-	public Date getDueDate() {
-		return dueDate;
+	public Date getDue() {
+		return due;
 	}
 
-	public void setDueDate(Date dueDate) {
-		this.dueDate = dueDate;
+	public void setDue(Date due) {
+		this.due = due;
 	}
 
 	public Long getId() {
@@ -185,8 +189,8 @@ public class Todo implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Todo [id=" + id + ", uuId=" + uuId + ", name=" + name + ", details=" + details + ", recurring="
-				+ recurring + ", frequency=" + frequency + ", category=" + category + ", projects=" + projects
-				+ ", tags=" + tags + ", creationDate=" + creationDate + ", dueDate=" + dueDate + "]";
+		return "Task [id=" + id + ", uuId=" + uuId + ", details=" + details + ", repeatType=" + repeatType
+				+ ", priority=" + priority + ", category=" + category + ", complete=" + complete + ", project="
+				+ project + ", tags=" + tags + ", creationDate=" + creationDate + ", due=" + due + "]";
 	}
 }
