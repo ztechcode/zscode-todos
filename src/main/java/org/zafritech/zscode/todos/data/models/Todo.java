@@ -7,15 +7,22 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.zafritech.zscode.todos.enums.Frequency;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity(name = "ZSCODE_TODOS_TODOS")
 public class Todo implements Serializable {
@@ -38,9 +45,25 @@ public class Todo implements Serializable {
     private Frequency frequency;
     
     private Category category;
-    
+
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @JoinTable(name = "ZSCODE_TODOS_TODOPROJECTS",
+            joinColumns = {
+                @JoinColumn(name = "todoId", referencedColumnName = "id")},
+            inverseJoinColumns = {
+                @JoinColumn(name = "projectId", referencedColumnName = "id")}
+    )
+    @JsonBackReference
     private Set<Project> projects = new HashSet<Project>();
 
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @JoinTable(name = "ZSCODE_TODOS_TODOTAGS",
+            joinColumns = {
+                @JoinColumn(name = "todoId", referencedColumnName = "id")},
+            inverseJoinColumns = {
+                @JoinColumn(name = "tagId", referencedColumnName = "id")}
+    )
+    @JsonBackReference
     private Set<Tag> tags = new HashSet<Tag>();
     
     @Temporal(TemporalType.TIMESTAMP)
