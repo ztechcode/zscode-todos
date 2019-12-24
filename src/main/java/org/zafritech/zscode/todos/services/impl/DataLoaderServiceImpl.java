@@ -1,4 +1,4 @@
-package org.zafritech.zscode.todos.data.init;
+package org.zafritech.zscode.todos.services.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +8,8 @@ import org.zafritech.zscode.todos.data.models.Category;
 import org.zafritech.zscode.todos.data.models.StateRegistry;
 import org.zafritech.zscode.todos.data.repositories.CategoryRepository;
 import org.zafritech.zscode.todos.data.repositories.StateRegistryRepository;
+import org.zafritech.zscode.todos.services.DataLoaderService;
+import org.zafritech.zscode.todos.services.StateRegistryService;
 
 @Service
 public class DataLoaderServiceImpl implements DataLoaderService {

@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
-import org.zafritech.zscode.todos.data.init.DataLoaderService;
+import org.zafritech.zscode.todos.services.DataLoaderService;
 
 @Component
 @ComponentScan("org.zafritech")

@@ -70,7 +70,7 @@ public class Task implements Serializable {
     private Set<Tag> tags = new HashSet<Tag>();
     
     @Temporal(TemporalType.TIMESTAMP)
-    private Date creationDate;
+    private Date created;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date due;
@@ -87,7 +87,7 @@ public class Task implements Serializable {
 		this.priority = Priority.MEDIUM;
 		this.category = null;
 		this.complete = false;
-		this.creationDate = new Timestamp(System.currentTimeMillis());
+		this.created = new Timestamp(System.currentTimeMillis());
 		this.due = new Timestamp(System.currentTimeMillis());;
 	}
 
@@ -99,7 +99,7 @@ public class Task implements Serializable {
 		this.priority = Priority.MEDIUM;
 		this.category = null;
 		this.complete = false;
-		this.creationDate = new Timestamp(System.currentTimeMillis());
+		this.created = new Timestamp(System.currentTimeMillis());
 		this.due = due;
 	}
 
@@ -167,12 +167,12 @@ public class Task implements Serializable {
 		this.tags = tags;
 	}
 
-	public Date getCreationDate() {
-		return creationDate;
+	public Date getCreated() {
+		return created;
 	}
 
-	public void setCreationDate(Date creationDate) {
-		this.creationDate = creationDate;
+	public void setCreated(Date created) {
+		this.created = created;
 	}
 
 	public Date getDue() {
@@ -191,6 +191,6 @@ public class Task implements Serializable {
 	public String toString() {
 		return "Task [id=" + id + ", uuId=" + uuId + ", details=" + details + ", repeatType=" + repeatType
 				+ ", priority=" + priority + ", category=" + category + ", complete=" + complete + ", project="
-				+ project + ", tags=" + tags + ", creationDate=" + creationDate + ", due=" + due + "]";
+				+ project + ", tags=" + tags + ", created=" + created + ", due=" + due + "]";
 	}
 }

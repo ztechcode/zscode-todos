@@ -6,8 +6,33 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "zafritech")
 public class TodosConfigProperties {
+	
+	private Organisation organisation;
 	 
     private Paths paths;
+    
+    public static class Organisation {
+    	
+    	private String name;
+
+        private String domain;
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public String getDomain() {
+			return domain;
+		}
+
+		public void setDomain(String domain) {
+			this.domain = domain;
+		}
+    }
 
     public static class Paths {
 
@@ -16,6 +41,8 @@ public class TodosConfigProperties {
         private String uploadDir;
 
         private String dataDir;
+        
+        private String imagesDir;
         
 		public String getStaticResources() {
 			return staticResources;
@@ -40,7 +67,24 @@ public class TodosConfigProperties {
 		public void setDataDir(String dataDir) {
 			this.dataDir = dataDir;
 		}
+
+		public String getImagesDir() {
+			return imagesDir;
+		}
+
+		public void setImagesDir(String imagesDir) {
+			this.imagesDir = imagesDir;
+		}
+		
     }
+
+	public Organisation getOrganisation() {
+		return organisation;
+	}
+
+	public void setOrganisation(Organisation organisation) {
+		this.organisation = organisation;
+	}
 
 	public Paths getPaths() {
 		return paths;

@@ -1,4 +1,4 @@
-package org.zafritech.zscode.todos.data.init;
+package org.zafritech.zscode.todos.services.impl;
 
 import java.sql.Timestamp;
 
@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.zafritech.zscode.todos.data.models.StateRegistry;
 import org.zafritech.zscode.todos.data.repositories.StateRegistryRepository;
+import org.zafritech.zscode.todos.services.StateRegistryService;
 
 @Service
 public class StateRegistryServiceImpl implements StateRegistryService {

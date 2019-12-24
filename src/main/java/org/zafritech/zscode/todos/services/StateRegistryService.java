@@ -1,4 +1,4 @@
-package org.zafritech.zscode.todos.data.init;
+package org.zafritech.zscode.todos.services;
 
 import org.springframework.stereotype.Service;
 import org.zafritech.zscode.todos.data.models.StateRegistry;
