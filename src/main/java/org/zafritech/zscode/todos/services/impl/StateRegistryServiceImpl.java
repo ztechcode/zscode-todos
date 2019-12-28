@@ -42,8 +42,8 @@ public class StateRegistryServiceImpl implements StateRegistryService {
 		}
 
 		state.setActive(true);
-		state.setCreationDateTime(new Timestamp(System.currentTimeMillis()));
-		state.setActivationDateTime(new Timestamp(System.currentTimeMillis()));
+		state.setCreated(new Timestamp(System.currentTimeMillis()));
+		state.setActivated(new Timestamp(System.currentTimeMillis()));
 
 		logger.info("Registry State " + dataKey + " completed....");
 

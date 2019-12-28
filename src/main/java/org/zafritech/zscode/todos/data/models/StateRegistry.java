@@ -23,9 +23,9 @@ public class StateRegistry implements Serializable {
     
     private boolean active;
 
-    private Timestamp creationDateTime;
+    private Timestamp created;
 
-    private Timestamp activationDateTime;
+    private Timestamp activated;
 
     public StateRegistry() {
         
@@ -36,7 +36,7 @@ public class StateRegistry implements Serializable {
         this.uuId = UUID.randomUUID().toString();
         this.stateKey = stateKey;
         this.active = false;
-        this.creationDateTime = new Timestamp(System.currentTimeMillis());
+        this.created = new Timestamp(System.currentTimeMillis());
     }
 
 	public String getUuId() {
@@ -63,20 +63,20 @@ public class StateRegistry implements Serializable {
 		this.active = active;
 	}
 
-	public Timestamp getCreationDateTime() {
-		return creationDateTime;
+	public Timestamp getCreated() {
+		return created;
 	}
 
-	public void setCreationDateTime(Timestamp creationDateTime) {
-		this.creationDateTime = creationDateTime;
+	public void setCreated(Timestamp created) {
+		this.created = created;
 	}
 
-	public Timestamp getActivationDateTime() {
-		return activationDateTime;
+	public Timestamp getActivated() {
+		return activated;
 	}
 
-	public void setActivationDateTime(Timestamp activationDateTime) {
-		this.activationDateTime = activationDateTime;
+	public void setActivated(Timestamp activated) {
+		this.activated = activated;
 	}
 
 	public Long getId() {
@@ -86,6 +86,6 @@ public class StateRegistry implements Serializable {
 	@Override
 	public String toString() {
 		return "StateRegistry [id=" + id + ", uuId=" + uuId + ", stateKey=" + stateKey + ", active=" + active
-				+ ", creationDateTime=" + creationDateTime + ", activationDateTime=" + activationDateTime + "]";
+				+ ", created=" + created + ", activated=" + activated + "]";
 	}
 }
