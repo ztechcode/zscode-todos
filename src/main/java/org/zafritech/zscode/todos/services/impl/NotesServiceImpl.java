@@ -19,6 +19,29 @@ public class NotesServiceImpl implements NotesService {
 	@Autowired
 	private NoteRepository noteRepository;
 
+
+
+	@Override
+	public Note findNoteById(String token, Long id) {
+		
+		try {
+			
+			String apiKey = identity.getApiKey(token);
+			Note note = noteRepository.findById(id).orElse(null);
+			
+			if (note != null && apiKey.equals(note.getOwner())) {
+				
+				return note;
+			}
+			
+		} catch (SignatureException e) {
+			
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
 	@Override
 	public Note createNote(String token, String text) {
         
@@ -53,6 +76,46 @@ public class NotesServiceImpl implements NotesService {
 		}
 		
 		return null;
+	}
+
+	@Override
+	public Note updateNote(String token, Note newNote) {
+
+		try {
+			
+			String apiKey = identity.getApiKey(token);
+			Note note = noteRepository.findById(newNote.getId()).orElse(null);
+			
+			if (note != null && apiKey.equals(note.getOwner())) {
+				
+				return noteRepository.save(newNote);
+			}
+			
+		} catch (SignatureException e) {
+			
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+
+	@Override
+	public void deleteNote(String token, Long id) {
+
+		try {
+			
+			String apiKey = identity.getApiKey(token);
+			Note note = noteRepository.findById(id).orElse(null);
+			
+			if (note != null && apiKey.equals(note.getOwner())) {
+				
+				noteRepository.delete(note);
+			}
+			
+		} catch (SignatureException e) {
+			
+			e.printStackTrace();
+		}
 	}
 
 }
