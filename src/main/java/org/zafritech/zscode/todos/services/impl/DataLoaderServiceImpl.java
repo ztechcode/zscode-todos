@@ -1,5 +1,8 @@
 package org.zafritech.zscode.todos.services.impl;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,10 +11,14 @@ import org.zafritech.zscode.todos.data.models.Category;
 import org.zafritech.zscode.todos.data.models.Project;
 import org.zafritech.zscode.todos.data.models.StateRegistry;
 import org.zafritech.zscode.todos.data.models.Tag;
+import org.zafritech.zscode.todos.data.models.Task;
 import org.zafritech.zscode.todos.data.repositories.CategoryRepository;
 import org.zafritech.zscode.todos.data.repositories.ProjectRepository;
 import org.zafritech.zscode.todos.data.repositories.StateRegistryRepository;
 import org.zafritech.zscode.todos.data.repositories.TagRepository;
+import org.zafritech.zscode.todos.data.repositories.TaskRepository;
+import org.zafritech.zscode.todos.enums.Priority;
+import org.zafritech.zscode.todos.enums.RepeatType;
 import org.zafritech.zscode.todos.services.DataLoaderService;
 import org.zafritech.zscode.todos.services.StateRegistryService;
 
@@ -26,6 +33,9 @@ public class DataLoaderServiceImpl implements DataLoaderService {
 
 	@Autowired
     private TagRepository tagRepository;
+	
+	@Autowired
+    private TaskRepository taskRepository;
 	
     @Autowired
     private StateRegistryRepository stateRepository;
@@ -90,6 +100,17 @@ public class DataLoaderServiceImpl implements DataLoaderService {
 
 		tag = tagRepository.save(new Tag("Spring"));
 		logger.info("Initialised tag: " + tag.getName()); 
+
+		// Task Intialisation
+		Task task = new Task("Go ahead with the development of ZSCODE");
+		task.setPriority(Priority.HIGH);
+		Set<Tag> tags = new HashSet<Tag>();
+		tags.add(tagRepository.findFirstByName("ZSCODE"));
+		tags.add(tagRepository.findFirstByName("DABASIR"));
+		task.setTags(tags);
+		task.setRepeatType(RepeatType.ONCE_DAILY);
+		task = taskRepository.save(task);
+		logger.info("Initialised tag: " + task.getDetails()); 
 		
         stateService.activateState(dataKey);
 	}

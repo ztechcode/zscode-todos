@@ -38,6 +38,8 @@ public class Task implements Serializable {
     private Long id;
     
     private String uuId;
+    
+    private Task parent;
 
     @NotNull
     @Column(columnDefinition = "TEXT")
@@ -82,6 +84,7 @@ public class Task implements Serializable {
 	public Task(String details) {
 	
 		this.uuId = UUID.randomUUID().toString();
+		this.parent = null;
 		this.details = details;
 		this.repeatType = RepeatType.ONCE_OFF;
 		this.priority = Priority.MEDIUM;
@@ -94,6 +97,7 @@ public class Task implements Serializable {
 	public Task(String details, Date due) {
 	
 		this.uuId = UUID.randomUUID().toString();
+		this.parent = null;
 		this.details = details;
 		this.repeatType = RepeatType.ONCE_OFF;
 		this.priority = Priority.MEDIUM;
@@ -109,6 +113,14 @@ public class Task implements Serializable {
 
 	public void setUuId(String uuId) {
 		this.uuId = uuId;
+	}
+
+	public Task getParent() {
+		return parent;
+	}
+
+	public void setParent(Task parent) {
+		this.parent = parent;
 	}
 
 	public String getDetails() {
@@ -191,6 +203,6 @@ public class Task implements Serializable {
 	public String toString() {
 		return "Task [id=" + id + ", uuId=" + uuId + ", details=" + details + ", repeatType=" + repeatType
 				+ ", priority=" + priority + ", category=" + category + ", complete=" + complete + ", project="
-				+ project + ", tags=" + tags + ", created=" + created + ", due=" + due + "]";
+				+ project.getName() + ", tags=" + tags + ", created=" + created + ", due=" + due + "]";
 	}
 }

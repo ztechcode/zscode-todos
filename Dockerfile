@@ -4,6 +4,6 @@ VOLUME /usr/zscode/todos
 CMD ["mkdir","images"]
 CMD ["mkdir","data"]
 CMD ["mkdir","uploads"]
-COPY target/*.jar zscode-todos.jar
-COPY src/main/resources/application.prod.properties config/application.properties
+COPY *.jar zscode-todos.jar
+COPY application.prod.properties config/application.properties
 ENTRYPOINT ["java","-jar","zscode-todos.jar"]
