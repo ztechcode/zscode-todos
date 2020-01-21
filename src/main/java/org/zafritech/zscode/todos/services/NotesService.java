@@ -8,14 +8,14 @@ import org.zafritech.zscode.todos.data.models.Note;
 @Service
 public interface NotesService {
 
+	public List<Note> fetchAllNotes(String token);
+	
 	public Note findNoteById(String token, Long id);
 	
 	public Note createNote(String token, String text);
 
-	public Note updateNote(String token, Note newNote);
+	public Note updateNote(String token, String text, Long id);
 		
-	public List<Note> fetchAllNotes(String token);
-	
 	public void deleteNote(String token, Long id);
-	
+
 }

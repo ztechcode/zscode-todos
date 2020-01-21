@@ -27,30 +27,79 @@ public class Identity {
 	public Identity()  { 
 
 	}
+
+	public boolean isValidToken(String token) {
+		
+		try {
+		
+			return validateToken(token);
+		
+		} catch (SignatureException e) {
+			
+			e.printStackTrace();
+		}
+		
+		return false;
+	}
+
+	public String getApiKey(String token) {
+				
+		try {
+		
+			return getClaims(token).get("uid", String.class);
+		
+		} catch (SignatureException e) {
+			
+			e.printStackTrace();
+		}
+		
+		return null;
+		
+	}
+
+	public String getEmail(String token) {
+				
+		try {
+		
+			return getClaims(token).get("eml", String.class);
+		
+		} catch (SignatureException e) {
+			
+			e.printStackTrace();
+		}
+		
+		return null;
+
+	}
+
+	public String getName(String token) {
+			
+		try {
+		
+			return  getClaims(token).get("fnm", String.class) + " " + getClaims(token).get("lnm", String.class);
+		
+		} catch (SignatureException e) {
+			
+			e.printStackTrace();
+		}
+		
+		return null;	
+		
+	}
 	
-	public boolean isValidToken(String token) throws SignatureException {
+	public String[] getRoles(String token) {
+				
+		try {
 		
-		return validateToken(token);
-	}
-
-	public String getApiKey(String token) throws SignatureException {
+			return getClaims(token).get("authorities", String[].class);
 		
-		return getClaims(token).get("uid", String.class);
-	}
-
-	public String getEmail(String token) throws SignatureException {
+		} catch (SignatureException e) {
+			
+			e.printStackTrace();
+		}
 		
-		return getClaims(token).get("eml", String.class);
-	}
-
-	public String getName(String token) throws SignatureException {
+		return null;
 		
-		return  getClaims(token).get("fnm", String.class) + " " + getClaims(token).get("lnm", String.class);
-	}
-	
-	public String[] getRoles(String token) throws SignatureException {
-		
-		return getClaims(token).get("authorities", String[].class);
 	}
 
 	private boolean validateToken(String authToken) throws SignatureException {

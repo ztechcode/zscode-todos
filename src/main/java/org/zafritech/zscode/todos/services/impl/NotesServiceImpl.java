@@ -1,6 +1,6 @@
 package org.zafritech.zscode.todos.services.impl;
 
-import java.security.SignatureException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,81 +19,59 @@ public class NotesServiceImpl implements NotesService {
 	@Autowired
 	private NoteRepository noteRepository;
 
-
+	@Override
+	public List<Note> fetchAllNotes(String token) {
+		
+		List<Note> notes = new ArrayList<>();
+		String apiKey = identity.getApiKey(token);
+		
+		if (apiKey != null) {
+		
+			notes = noteRepository.findByOwnerOrderByTimestampDesc(apiKey);
+		}
+		
+		return notes;
+	}
 
 	@Override
 	public Note findNoteById(String token, Long id) {
 		
-		try {
+		if (userAuthorised(token, id)) {
 			
-			String apiKey = identity.getApiKey(token);
-			Note note = noteRepository.findById(id).orElse(null);
+			return noteRepository.findById(id).orElse(null);
 			
-			if (note != null && apiKey.equals(note.getOwner())) {
-				
-				return note;
-			}
+		} else {
 			
-		} catch (SignatureException e) {
-			
-			e.printStackTrace();
+			return null;
 		}
-		
-		return null;
 	}
 	
 	@Override
 	public Note createNote(String token, String text) {
-        
-		try {
+
+		String apiKey = identity.getApiKey(token);
+		
+		if (apiKey != null) {
 			
-			String apiKey = identity.getApiKey(token);
 			Note note = new Note(apiKey, text);
-			
 			return  noteRepository.save(note);
 			
-		} catch (SignatureException e) {
+		} else {
 			
-			e.printStackTrace();
+			return null;
 		}
-				
-		return null;
 	}
 
 	@Override
-	public List<Note> fetchAllNotes(String token) {
-		
-		try {
-			
-			String apiKey = identity.getApiKey(token);
-			List<Note> notes = noteRepository.findByOwnerOrderByTimestampDesc(apiKey);
-			
-			return notes;
-			
-		} catch (SignatureException e) {
-			
-			e.printStackTrace();
-		}
-		
-		return null;
-	}
+	public Note updateNote(String token, String text, Long id) {
 
-	@Override
-	public Note updateNote(String token, Note newNote) {
-
-		try {
+		if (userAuthorised(token, id)) {
 			
-			String apiKey = identity.getApiKey(token);
-			Note note = noteRepository.findById(newNote.getId()).orElse(null);
+			Note note = noteRepository.findById(id).orElse(null);			
+			note.setText(text);
 			
-			if (note != null && apiKey.equals(note.getOwner())) {
-				
-				return noteRepository.save(newNote);
-			}
+			return noteRepository.save(note);
 			
-		} catch (SignatureException e) {
-			
-			e.printStackTrace();
 		}
 		
 		return null;
@@ -101,21 +79,29 @@ public class NotesServiceImpl implements NotesService {
 
 	@Override
 	public void deleteNote(String token, Long id) {
-
-		try {
+		
+		if (userAuthorised(token, id)) {
 			
-			String apiKey = identity.getApiKey(token);
 			Note note = noteRepository.findById(id).orElse(null);
 			
-			if (note != null && apiKey.equals(note.getOwner())) {
-				
+			if (note != null) {
+			
 				noteRepository.delete(note);
 			}
-			
-		} catch (SignatureException e) {
-			
-			e.printStackTrace();
 		}
 	}
 
+	private boolean userAuthorised(String token, Long id) {
+
+		String apiKey = identity.getApiKey(token);
+		Note note = noteRepository.findById(id).orElse(null);
+		
+		if (note != null && apiKey.equals(note.getOwner())) {
+				
+			return true;
+		}
+
+		return false;
+	}
+	
 }
