@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>org.zafritech</groupId>
 	<artifactId>zscode-todos</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<name>zscode-todos</name>
 	<description>Zafritech ZSCode Todos Microservices</description>
 

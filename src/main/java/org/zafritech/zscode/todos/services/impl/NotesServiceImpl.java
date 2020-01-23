@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.zafritech.zscode.todos.data.daos.JsonNoteDao;
 import org.zafritech.zscode.todos.data.models.Note;
 import org.zafritech.zscode.todos.data.repositories.NoteRepository;
 import org.zafritech.zscode.todos.security.Identity;
@@ -47,13 +48,13 @@ public class NotesServiceImpl implements NotesService {
 	}
 	
 	@Override
-	public Note createNote(String token, String text) {
+	public Note createNote(String token, JsonNoteDao dao) {
 
 		String apiKey = identity.getApiKey(token);
 		
 		if (apiKey != null) {
 			
-			Note note = new Note(apiKey, text);
+			Note note = new Note(apiKey, dao.getText());
 			return  noteRepository.save(note);
 			
 		} else {
@@ -63,12 +64,12 @@ public class NotesServiceImpl implements NotesService {
 	}
 
 	@Override
-	public Note updateNote(String token, String text, Long id) {
+	public Note updateNote(String token, JsonNoteDao dao) {
 
-		if (userAuthorised(token, id)) {
+		if (userAuthorised(token, dao.getId())) {
 			
-			Note note = noteRepository.findById(id).orElse(null);			
-			note.setText(text);
+			Note note = noteRepository.findById(dao.getId()).orElse(null);			
+			note.setText(dao.getText());
 			
 			return noteRepository.save(note);
 			
