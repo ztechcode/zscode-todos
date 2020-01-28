@@ -18,7 +18,6 @@ import org.zafritech.zscode.todos.data.repositories.StateRegistryRepository;
 import org.zafritech.zscode.todos.data.repositories.TagRepository;
 import org.zafritech.zscode.todos.data.repositories.TaskRepository;
 import org.zafritech.zscode.todos.enums.Priority;
-import org.zafritech.zscode.todos.enums.RepeatType;
 import org.zafritech.zscode.todos.services.DataLoaderService;
 import org.zafritech.zscode.todos.services.StateRegistryService;
 
@@ -54,7 +53,7 @@ public class DataLoaderServiceImpl implements DataLoaderService {
 	}
 
 	@Override
-	public void initialiseTodos(String dataKey) {
+	public void initialiseTasks(String dataKey) {
 
 		// Categories Initialisation
 		Category category = categoryRepository.save(new Category("Uncategorised"));
@@ -100,6 +99,9 @@ public class DataLoaderServiceImpl implements DataLoaderService {
 
 		tag = tagRepository.save(new Tag("Spring"));
 		logger.info("Initialised tag: " + tag.getName()); 
+		
+		tag = tagRepository.save(new Tag("Android"));
+		logger.info("Initialised tag: " + tag.getName()); 
 
 		// Task Intialisation
 		Task task = new Task("Go ahead with the development of ZSCODE");
@@ -108,7 +110,6 @@ public class DataLoaderServiceImpl implements DataLoaderService {
 		tags.add(tagRepository.findFirstByName("ZSCODE"));
 		tags.add(tagRepository.findFirstByName("DABASIR"));
 		task.setTags(tags);
-		task.setRepeatType(RepeatType.ONCE_DAILY);
 		task = taskRepository.save(task);
 		logger.info("Initialised tag: " + task.getDetails()); 
 		

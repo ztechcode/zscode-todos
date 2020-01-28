@@ -29,5 +29,9 @@ public interface TodosService {
 	
 	public Task updateTaskPriority(String priority, Long id);
 	
-	public Task updateTaskRepeatType(String repeat, Long id);
+	public Task updateTaskRepeatType(Long id);
+	
+	public Task scheduleTaskRepeat(Long id);
+	
+	public void scheduleAllRepeatTasks();
 }

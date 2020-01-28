@@ -18,7 +18,7 @@ public class TodosStartCLR implements CommandLineRunner {
 
 		if (!dataLoader.isInitialised("TODOS_CATEGORY_INIT")) { 
 			
-			dataLoader.initialiseTodos("TODOS_CATEGORY_INIT"); 
+			dataLoader.initialiseTasks("TODOS_CATEGORY_INIT"); 
 		}
 	}
 }

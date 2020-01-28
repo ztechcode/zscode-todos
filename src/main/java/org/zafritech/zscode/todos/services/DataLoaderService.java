@@ -7,5 +7,5 @@ public interface DataLoaderService {
 	
 	public boolean isInitialised(String dataKey);
 
-	public void initialiseTodos(String dataKey);
+	public void initialiseTasks(String dataKey);
 }

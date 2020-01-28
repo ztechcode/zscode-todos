@@ -24,7 +24,6 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
 import org.zafritech.zscode.todos.enums.Priority;
-import org.zafritech.zscode.todos.enums.RepeatType;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -37,7 +36,9 @@ public class Task implements Serializable {
     @GeneratedValue
     private Long id;
     
-    private String uuId;
+    private String uuid;
+
+    private String owner;
     
     private Task parent;
 
@@ -45,8 +46,9 @@ public class Task implements Serializable {
     @Column(columnDefinition = "TEXT")
     private String details;
 
-    @Enumerated(EnumType.STRING)
-    private RepeatType repeatType;
+    @ManyToOne
+    @JoinColumn(name = "repeatId")
+    private Repeat repeat;
 
     @Enumerated(EnumType.STRING)
     private Priority priority;
@@ -62,7 +64,7 @@ public class Task implements Serializable {
     private Project project;
 
     @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-    @JoinTable(name = "ZSCODE_TODOS_TASKSTAGS",
+    @JoinTable(name = "ZSCODE_TODOS_TASKTAGS",
             joinColumns = {
                 @JoinColumn(name = "taskId", referencedColumnName = "id")},
             inverseJoinColumns = {
@@ -70,7 +72,17 @@ public class Task implements Serializable {
     )
     @JsonBackReference
     private Set<Tag> tags = new HashSet<Tag>();
-    
+
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @JoinTable(name = "ZSCODE_TODOS_TASKNOTES",
+            joinColumns = {
+                @JoinColumn(name = "taskId", referencedColumnName = "id")},
+            inverseJoinColumns = {
+                @JoinColumn(name = "noteId", referencedColumnName = "id")}
+    )
+    @JsonBackReference
+    private Set<Note> notes = new HashSet<Note>();
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;
 
@@ -83,10 +95,9 @@ public class Task implements Serializable {
 
 	public Task(String details) {
 	
-		this.uuId = UUID.randomUUID().toString();
+		this.uuid = UUID.randomUUID().toString();
 		this.parent = null;
 		this.details = details;
-		this.repeatType = RepeatType.ONCE_OFF;
 		this.priority = Priority.MEDIUM;
 		this.category = null;
 		this.complete = false;
@@ -96,10 +107,9 @@ public class Task implements Serializable {
 
 	public Task(String details, Date due) {
 	
-		this.uuId = UUID.randomUUID().toString();
+		this.uuid = UUID.randomUUID().toString();
 		this.parent = null;
 		this.details = details;
-		this.repeatType = RepeatType.ONCE_OFF;
 		this.priority = Priority.MEDIUM;
 		this.category = null;
 		this.complete = false;
@@ -107,12 +117,20 @@ public class Task implements Serializable {
 		this.due = due;
 	}
 
-	public String getUuId() {
-		return uuId;
+	public String getUuid() {
+		return uuid;
 	}
 
-	public void setUuId(String uuId) {
-		this.uuId = uuId;
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
+	public String getOwner() {
+		return owner;
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
 	}
 
 	public Task getParent() {
@@ -131,12 +149,12 @@ public class Task implements Serializable {
 		this.details = details;
 	}
 
-	public RepeatType getRepeatType() {
-		return repeatType;
+	public Repeat getRepeat() {
+		return repeat;
 	}
 
-	public void setRepeatType(RepeatType repeatType) {
-		this.repeatType = repeatType;
+	public void setRepeat(Repeat repeat) {
+		this.repeat = repeat;
 	}
 
 	public Priority getPriority() {
@@ -179,6 +197,14 @@ public class Task implements Serializable {
 		this.tags = tags;
 	}
 
+	public Set<Note> getNotes() {
+		return notes;
+	}
+
+	public void setNotes(Set<Note> notes) {
+		this.notes = notes;
+	}
+
 	public Date getCreated() {
 		return created;
 	}
@@ -201,8 +227,9 @@ public class Task implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Task [id=" + id + ", uuId=" + uuId + ", details=" + details + ", repeatType=" + repeatType
-				+ ", priority=" + priority + ", category=" + category + ", complete=" + complete + ", project="
-				+ project.getName() + ", tags=" + tags + ", created=" + created + ", due=" + due + "]";
+		return "Task [id=" + id + ", uuid=" + uuid + ", owner=" + owner + ", parent=" + parent + ", details=" + details
+				+ ", repeat=" + repeat + ", priority=" + priority + ", category=" + category + ", complete=" + complete
+				+ ", project=" + project + ", tags=" + tags + ", notes=" + notes + ", created=" + created + ", due="
+				+ due + "]";
 	}
 }

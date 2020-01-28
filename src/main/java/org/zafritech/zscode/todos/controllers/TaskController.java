@@ -84,7 +84,7 @@ public class TaskController {
 	public ResponseEntity<Task> updateTaskRepeatType(@RequestParam("repeat") String repeat,
 										             @PathVariable(value = "id") Long id) { 
 		
-		Task task = todosService.updateTaskRepeatType(repeat, id);
+		Task task = todosService.updateTaskRepeatType(id);
 		
 		return new ResponseEntity<>(task, HttpStatus.OK);
 	}
