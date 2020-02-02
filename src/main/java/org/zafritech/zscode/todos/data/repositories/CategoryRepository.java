@@ -7,7 +7,8 @@ import org.zafritech.zscode.todos.data.models.Category;
 
 public interface CategoryRepository extends CrudRepository<Category, Long> {
 
-	Category findFirstByName(String name);
+	Category findFirstByNameIgnoreCase(String name);
 	
 	List<Category> findAllByOrderByNameAsc();
+	
 }

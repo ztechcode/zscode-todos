@@ -1,37 +1,33 @@
 package org.zafritech.zscode.todos.services;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
-import org.zafritech.zscode.todos.data.models.Category;
-import org.zafritech.zscode.todos.data.models.Project;
-import org.zafritech.zscode.todos.data.models.Tag;
+import org.zafritech.zscode.todos.data.daos.TasksRequestDateDao;
+import org.zafritech.zscode.todos.data.daos.TasksRequestRangeDao;
+import org.zafritech.zscode.todos.data.models.Schedule;
 import org.zafritech.zscode.todos.data.models.Task;
 
 @Service
 public interface TodosService {
 
-	public Category createCategory(String name);
-	
-	public Category updateCategory(String name, Long id);
-	
-	public Project createProject(String name);
-	
-	public Project updateProject(String name, Long id);
-
-	public Tag createTag(String name);
-	
-	public Tag updateTag(String name, Long id);
+	public List<Task> filterTaskByCategory(String filter);
 	
 	public Task createTask(String details);
-	
-	public Task completeTask(Long id);
 	
 	public Task updateTask(String details, Long id);
 	
 	public Task updateTaskPriority(String priority, Long id);
+
+	public Schedule completeScheduledTask(Long id);
 	
-	public Task updateTaskRepeatType(Long id);
+	public List<Schedule> findTaskByDate(TasksRequestDateDao dao);
 	
-	public Task scheduleTaskRepeat(Long id);
+	public List<Schedule> findTaskByDateRange(TasksRequestRangeDao dao);
+
+	public void scheduleNonRepeatTasks();
 	
-	public void scheduleAllRepeatTasks();
+	public void scheduleFutureRepeatTasks();
+	
+	public Integer scheduleRepeatTask(Long id, Integer days);
 }

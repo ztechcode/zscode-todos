@@ -1,10 +1,13 @@
 package org.zafritech.zscode.todos.data.models;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.UUID;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Temporal;
@@ -22,31 +25,27 @@ public class Repeat implements Serializable {
     private Long id;
     
     private String uuid;
-    
+
+    @Enumerated(EnumType.STRING)
     private RepeatType type;
 	
 	private Integer count;
 
     @Temporal(TemporalType.TIMESTAMP)
-	private Date current;
-
-    @Temporal(TemporalType.TIMESTAMP)
-	private Date last;
-
-    @Temporal(TemporalType.TIMESTAMP)
-	private Date started;
+	private Date start;
+    
+    private LocalDate lastRepeat;
 
 	public Repeat() {
 		
 	}
 
-	public Repeat(RepeatType type, Integer count, Date current, Date started) {
+	public Repeat(RepeatType type, Integer count, Date start) {
 		
 		this.uuid = UUID.randomUUID().toString();
 		this.type = type;
 		this.count = count;
-		this.current = current;
-		this.started = started;
+		this.start = start;
 	}
 
 	public Long getId() {
@@ -65,16 +64,8 @@ public class Repeat implements Serializable {
 		return count;
 	}
 
-	public Date getCurrent() {
-		return current;
-	}
-
-	public Date getLast() {
-		return last;
-	}
-
-	public Date getStarted() {
-		return started;
+	public Date getStart() {
+		return start;
 	}
 
 	public void setUuid(String uuid) {
@@ -89,21 +80,22 @@ public class Repeat implements Serializable {
 		this.count = count;
 	}
 
-	public void setCurrent(Date current) {
-		this.current = current;
+	public void setStart(Date start) {
+		this.start = start;
+	}
+	
+	public LocalDate getLastRepeat() {
+		return lastRepeat;
 	}
 
-	public void setLast(Date last) {
-		this.last = last;
-	}
-
-	public void setStarted(Date started) {
-		this.started = started;
+	public void setLastRepeat(LocalDate lastRepeat) {
+		this.lastRepeat = lastRepeat;
 	}
 
 	@Override
 	public String toString() {
-		return "Repeat [id=" + id + ", uuid=" + uuid + ", type=" + type + ", count=" + count + ", current=" + current
-				+ ", last=" + last + ", started=" + started + "]";
+		return "Repeat [id=" + id + ", uuid=" + uuid + ", type=" + type + ", count=" + count + ", start=" + start
+				+ ", lastRepeat=" + lastRepeat + "]";
 	}
+
 }

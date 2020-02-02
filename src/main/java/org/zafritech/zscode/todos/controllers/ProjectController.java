@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.zafritech.zscode.todos.data.models.Project;
 import org.zafritech.zscode.todos.data.repositories.ProjectRepository;
-import org.zafritech.zscode.todos.services.TodosService;
+import org.zafritech.zscode.todos.services.CategoryService;
 
 @RestController
 @RequestMapping("/projects")
@@ -23,7 +23,7 @@ public class ProjectController {
 	private ProjectRepository projectRepository;
 
 	@Autowired
-	private TodosService todosService;
+	private CategoryService categoryService;
 
 	@RequestMapping(value = {"/", ""}, method = RequestMethod.GET)
     public ResponseEntity<List<Project>> fetchAllProjects() {
@@ -49,7 +49,7 @@ public class ProjectController {
 	@RequestMapping(value = "/project/save", method = RequestMethod.POST)
 	public ResponseEntity<Project> createProject(@RequestParam("name") String name) { 
 		
-		Project project = todosService.createProject(name);
+		Project project = categoryService.createProject(name);
 		
 		return new ResponseEntity<>(project, HttpStatus.OK);
 	}
@@ -58,7 +58,7 @@ public class ProjectController {
 	public ResponseEntity<Project> updateProject(@RequestParam("name") String name,
 										   	     @PathVariable(value = "id") Long id) { 
 		
-		Project project = todosService.updateProject(name, id);
+		Project project = categoryService.updateProject(name, id);
 		
 		return new ResponseEntity<>(project, HttpStatus.OK);
 	}

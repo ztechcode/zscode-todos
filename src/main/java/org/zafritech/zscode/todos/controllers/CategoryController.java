@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.zafritech.zscode.todos.data.models.Category;
 import org.zafritech.zscode.todos.data.repositories.CategoryRepository;
-import org.zafritech.zscode.todos.services.TodosService;
+import org.zafritech.zscode.todos.services.CategoryService;
 
 @RestController
 @RequestMapping("/categories")
@@ -23,7 +23,7 @@ public class CategoryController {
 	private CategoryRepository categoryRepository;
 
 	@Autowired
-	private TodosService todosService;
+	private CategoryService categoryService;
 
 	@RequestMapping(value = {"/", ""}, method = RequestMethod.GET)
     public ResponseEntity<List<Category>> fetchAllCategories() {
@@ -49,7 +49,7 @@ public class CategoryController {
 	@RequestMapping(value = "/category/save", method = RequestMethod.POST)
 	public ResponseEntity<Category> createCategory(@RequestParam("name") String name) { 
 		
-		Category category = todosService.createCategory(name);
+		Category category = categoryService.createCategory(name);
 		
 		return new ResponseEntity<>(category, HttpStatus.OK);
 	}
@@ -58,7 +58,7 @@ public class CategoryController {
 	public ResponseEntity<Category> updateCategory(@RequestParam("name") String name,
 										   	   @PathVariable(value = "id") Long id) { 
 		
-		Category category = todosService.updateCategory(name, id);
+		Category category = categoryService.updateCategory(name, id);
 		
 		return new ResponseEntity<>(category, HttpStatus.OK);
 	}

@@ -11,7 +11,13 @@ public interface TaskRepository extends CrudRepository<Task, Long> {
 	@Override
 	List<Task> findAll();
 	
-	List<Task> findAllByOrderByDueDesc();
-	
 	List<Task> findByRepeat(Repeat repeat);
+	
+//	List<Task> findAllByCategoryOrderByDueDesc(String filter);
+	List<Task> findAllByCategory(String filter);
+	
+//	List<Task> findAllByDateEqualAndByCategoryOrderByDueDesc(LocalDate date, String filter);
+	
+//	List<Task> findAllByStartDateLessThanEqualAndEndDateGreaterThanEqualAndByCategoryOrderByDueDesc(Date end, Date start, String filter);
+	
 }

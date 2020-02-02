@@ -11,9 +11,9 @@ public class ScheduledTasks {
 	@Autowired
     private TodosService todosService;
 	
-	@Scheduled(cron = "0 0,30 * * * *") // Every hour at minutes 00 and 30
+	@Scheduled(cron = "0 0 0,12 * * *") // Every day at 00:00 and 12:00
 	public void scheduleRecurringTasks() {
 		
-		todosService.scheduleAllRepeatTasks();
+		todosService.scheduleFutureRepeatTasks();
 	}
 }

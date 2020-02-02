@@ -2,6 +2,7 @@ package org.zafritech.zscode.todos.data.models;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -57,8 +58,6 @@ public class Task implements Serializable {
     @JoinColumn(name = "categoryId")
     private Category category;
     
-    private boolean complete;
-
     @ManyToOne
     @JoinColumn(name = "projectId")
     private Project project;
@@ -83,11 +82,10 @@ public class Task implements Serializable {
     @JsonBackReference
     private Set<Note> notes = new HashSet<Note>();
 
+    private LocalDate target;
+    
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date due;
 
 	public Task() {
 
@@ -100,109 +98,109 @@ public class Task implements Serializable {
 		this.details = details;
 		this.priority = Priority.MEDIUM;
 		this.category = null;
-		this.complete = false;
 		this.created = new Timestamp(System.currentTimeMillis());
-		this.due = new Timestamp(System.currentTimeMillis());;
 	}
 
-	public Task(String details, Date due) {
+	public Task(String details, LocalDate target) {
 	
 		this.uuid = UUID.randomUUID().toString();
 		this.parent = null;
 		this.details = details;
 		this.priority = Priority.MEDIUM;
 		this.category = null;
-		this.complete = false;
 		this.created = new Timestamp(System.currentTimeMillis());
-		this.due = due;
+	}
+
+	public Long getId() {
+		return id;
 	}
 
 	public String getUuid() {
 		return uuid;
 	}
 
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-
 	public String getOwner() {
 		return owner;
-	}
-
-	public void setOwner(String owner) {
-		this.owner = owner;
 	}
 
 	public Task getParent() {
 		return parent;
 	}
 
-	public void setParent(Task parent) {
-		this.parent = parent;
-	}
-
 	public String getDetails() {
 		return details;
-	}
-
-	public void setDetails(String details) {
-		this.details = details;
 	}
 
 	public Repeat getRepeat() {
 		return repeat;
 	}
 
-	public void setRepeat(Repeat repeat) {
-		this.repeat = repeat;
-	}
-
 	public Priority getPriority() {
 		return priority;
-	}
-
-	public void setPriority(Priority priority) {
-		this.priority = priority;
 	}
 
 	public Category getCategory() {
 		return category;
 	}
 
-	public boolean isComplete() {
-		return complete;
-	}
-
-	public void setComplete(boolean complete) {
-		this.complete = complete;
-	}
-
-	public void setCategory(Category category) {
-		this.category = category;
-	}
-
 	public Project getProject() {
 		return project;
-	}
-
-	public void setProject(Project project) {
-		this.project = project;
 	}
 
 	public Set<Tag> getTags() {
 		return tags;
 	}
 
-	public void setTags(Set<Tag> tags) {
-		this.tags = tags;
-	}
-
 	public Set<Note> getNotes() {
 		return notes;
 	}
 
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
+
+	public void setParent(Task parent) {
+		this.parent = parent;
+	}
+
+	public void setDetails(String details) {
+		this.details = details;
+	}
+
+	public void setRepeat(Repeat repeat) {
+		this.repeat = repeat;
+	}
+
+	public void setPriority(Priority priority) {
+		this.priority = priority;
+	}
+
+	public void setCategory(Category category) {
+		this.category = category;
+	}
+
+	public void setProject(Project project) {
+		this.project = project;
+	}
+
+	public void setTags(Set<Tag> tags) {
+		this.tags = tags;
+	}
+
 	public void setNotes(Set<Note> notes) {
 		this.notes = notes;
+	}
+
+	public LocalDate getTarget() {
+		return target;
+	}
+
+	public void setTarget(LocalDate target) {
+		this.target = target;
 	}
 
 	public Date getCreated() {
@@ -213,23 +211,10 @@ public class Task implements Serializable {
 		this.created = created;
 	}
 
-	public Date getDue() {
-		return due;
-	}
-
-	public void setDue(Date due) {
-		this.due = due;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
 	@Override
 	public String toString() {
 		return "Task [id=" + id + ", uuid=" + uuid + ", owner=" + owner + ", parent=" + parent + ", details=" + details
-				+ ", repeat=" + repeat + ", priority=" + priority + ", category=" + category + ", complete=" + complete
-				+ ", project=" + project + ", tags=" + tags + ", notes=" + notes + ", created=" + created + ", due="
-				+ due + "]";
+				+ ", repeat=" + repeat + ", priority=" + priority + ", category=" + category + ", project=" + project
+				+ ", tags=" + tags + ", notes=" + notes + ", created=" + created + "]";
 	}
 }

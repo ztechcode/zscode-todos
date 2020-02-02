@@ -6,12 +6,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import org.zafritech.zscode.todos.data.daos.TasksRequestDateDao;
+import org.zafritech.zscode.todos.data.daos.TasksRequestRangeDao;
+import org.zafritech.zscode.todos.data.models.Schedule;
 import org.zafritech.zscode.todos.data.models.Task;
+import org.zafritech.zscode.todos.data.repositories.ScheduleRepository;
 import org.zafritech.zscode.todos.data.repositories.TaskRepository;
 import org.zafritech.zscode.todos.services.TodosService;
 
@@ -23,16 +28,35 @@ public class TaskController {
 	private TaskRepository taskRepository;
 	
 	@Autowired
+	private ScheduleRepository scheduleRepository;
+	
+	@Autowired
 	private TodosService todosService;
 
 	@RequestMapping(value = {"/", ""}, method = RequestMethod.GET)
-    public ResponseEntity<List<Task>> fetchAllUsers() {
+    public ResponseEntity<List<Schedule>> fetchAllTasks() {
 		
-		List<Task> tasks = taskRepository.findAllByOrderByDueDesc();
+		List<Schedule> schedules = scheduleRepository.findAllByOrderByTimeAsc(); 
 		
-		return new ResponseEntity<>(tasks, HttpStatus.OK);
+		return new ResponseEntity<>(schedules, HttpStatus.OK);
+	}	
+	
+	@RequestMapping(value = "/date", method = RequestMethod.POST)
+	public ResponseEntity<List<Schedule>> tasksByDate(@RequestBody TasksRequestDateDao dao) {
+		
+		List<Schedule> schedules = todosService.findTaskByDate(dao);
+		
+		return new ResponseEntity<>(schedules, HttpStatus.OK);
 	}	
 
+	@RequestMapping(value = "/range", method = RequestMethod.POST)
+	public ResponseEntity<List<Schedule>> tasksByRange(@RequestBody TasksRequestRangeDao dao) {
+		
+		List<Schedule> schedules = todosService.findTaskByDateRange(dao);
+		
+		return new ResponseEntity<>(schedules, HttpStatus.OK);
+	}	
+	
 	@RequestMapping(value = "/id/{id}", method = RequestMethod.GET)
     public ResponseEntity<Task> getTaskById(@PathVariable(value = "id") Long id) {
 		
@@ -55,11 +79,11 @@ public class TaskController {
 	}
 	
 	@RequestMapping(value = "/task/complete/{id}", method = RequestMethod.PUT)
-	public ResponseEntity<Task> completeTask(@PathVariable(value = "id") Long id) { 
+	public ResponseEntity<Schedule> completeScheduledTask(@PathVariable(value = "id") Long id) { 
 		
-		Task task = todosService.completeTask(id);
+		Schedule schedule = todosService.completeScheduledTask(id);
 		
-		return new ResponseEntity<>(task, HttpStatus.OK);
+		return new ResponseEntity<>(schedule, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/task/update/{id}", method = RequestMethod.PUT)
@@ -79,16 +103,7 @@ public class TaskController {
 		
 		return new ResponseEntity<>(task, HttpStatus.OK);
 	}
-	
-	@RequestMapping(value = "/task/repeat/{id}", method = RequestMethod.PUT)
-	public ResponseEntity<Task> updateTaskRepeatType(@RequestParam("repeat") String repeat,
-										             @PathVariable(value = "id") Long id) { 
-		
-		Task task = todosService.updateTaskRepeatType(id);
-		
-		return new ResponseEntity<>(task, HttpStatus.OK);
-	}
-	
+
 	@RequestMapping(value = "/task/delete/{id}", method = RequestMethod.PUT)
 	public ResponseEntity<?> deleteTask(@PathVariable(value = "id") Long id) { 
 		

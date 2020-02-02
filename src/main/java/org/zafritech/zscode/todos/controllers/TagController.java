@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.zafritech.zscode.todos.data.models.Tag;
 import org.zafritech.zscode.todos.data.repositories.TagRepository;
-import org.zafritech.zscode.todos.services.TodosService;
+import org.zafritech.zscode.todos.services.CategoryService;
 
 @RestController
 @RequestMapping("/tags")
@@ -23,7 +23,7 @@ public class TagController {
 	private TagRepository tagRepository;
 
 	@Autowired
-	private TodosService todosService;
+	private CategoryService categoryService;
 
 	@RequestMapping(value = {"/", ""}, method = RequestMethod.GET)
     public ResponseEntity<List<Tag>> fetchAllTags() {
@@ -49,7 +49,7 @@ public class TagController {
 	@RequestMapping(value = "/tag/save", method = RequestMethod.POST)
 	public ResponseEntity<Tag> createTag(@RequestParam("name") String name) { 
 		
-		Tag tag = todosService.createTag(name);
+		Tag tag = categoryService.createTag(name);
 		
 		return new ResponseEntity<>(tag, HttpStatus.OK);
 	}
@@ -58,7 +58,7 @@ public class TagController {
 	public ResponseEntity<Tag> updateProject(@RequestParam("name") String name,
 										   	 @PathVariable(value = "id") Long id) { 
 		
-		Tag tag = todosService.updateTag(name, id);
+		Tag tag = categoryService.updateTag(name, id);
 		
 		return new ResponseEntity<>(tag, HttpStatus.OK);
 	}

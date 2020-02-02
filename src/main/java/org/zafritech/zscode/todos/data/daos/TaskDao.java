@@ -1,5 +1,8 @@
 package org.zafritech.zscode.todos.data.daos;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TaskDao {
 
     private Long id;
@@ -8,7 +11,7 @@ public class TaskDao {
 
     private String details;
 
-    private String repeatType;
+    private RepeatDao repeat;
 
     private String priority;
 
@@ -48,12 +51,12 @@ public class TaskDao {
 		this.details = details;
 	}
 
-	public String getRepeatType() {
-		return repeatType;
+	public RepeatDao getRepeat() {
+		return repeat;
 	}
 
-	public void setRepeatType(String repeatType) {
-		this.repeatType = repeatType;
+	public void setRepeat(RepeatDao repeat) {
+		this.repeat = repeat;
 	}
 
 	public String getPriority() {
@@ -96,10 +99,4 @@ public class TaskDao {
 		this.due = due;
 	}
 
-	@Override
-	public String toString() {
-		return "TaskDao [id=" + id + ", uuId=" + uuId + ", details=" + details + ", repeatType=" + repeatType
-				+ ", priority=" + priority + ", category=" + category + ", complete=" + complete + ", project="
-				+ project + ", due=" + due + "]";
-	}
 }

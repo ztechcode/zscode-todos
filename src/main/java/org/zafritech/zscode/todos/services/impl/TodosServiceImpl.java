@@ -1,32 +1,42 @@
 package org.zafritech.zscode.todos.services.impl;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.zafritech.zscode.todos.ScheduledTasks;
+import org.zafritech.zscode.todos.data.daos.TasksRequestDateDao;
+import org.zafritech.zscode.todos.data.daos.TasksRequestRangeDao;
 import org.zafritech.zscode.todos.data.models.Category;
-import org.zafritech.zscode.todos.data.models.Project;
 import org.zafritech.zscode.todos.data.models.Repeat;
-import org.zafritech.zscode.todos.data.models.Tag;
+import org.zafritech.zscode.todos.data.models.Schedule;
 import org.zafritech.zscode.todos.data.models.Task;
 import org.zafritech.zscode.todos.data.repositories.CategoryRepository;
-import org.zafritech.zscode.todos.data.repositories.ProjectRepository;
 import org.zafritech.zscode.todos.data.repositories.RepeatRepository;
-import org.zafritech.zscode.todos.data.repositories.TagRepository;
+import org.zafritech.zscode.todos.data.repositories.ScheduleRepository;
 import org.zafritech.zscode.todos.data.repositories.TaskRepository;
 import org.zafritech.zscode.todos.enums.Priority;
-import org.zafritech.zscode.todos.enums.RepeatType;
 import org.zafritech.zscode.todos.services.TodosService;
+import org.zafritech.zscode.todos.utils.TimeUtils;
 
 @Service
 public class TodosServiceImpl implements TodosService {
 
+	@Autowired
+    private TimeUtils timeUtils;
+	
 	@Autowired
 	private TaskRepository taskRepository;
 	
@@ -34,114 +44,84 @@ public class TodosServiceImpl implements TodosService {
 	private RepeatRepository repeatRepository;
 	
 	@Autowired
+	private ScheduleRepository scheduleRepository;
+	
+	@Autowired
 	private CategoryRepository categoryRepository;
 
-	@Autowired
-	private ProjectRepository projectRepository;
-	
-	@Autowired
-	private TagRepository tagRepository;
-
 	private static final Logger log = LoggerFactory.getLogger(ScheduledTasks.class);
-	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	
+	private static final Integer daysLookAhead = 428;
 	
 	@Override
-	public Category createCategory(String name) {
-
-		Category category = new Category(name);
-		category = categoryRepository.save(category); 
+	public List<Task> filterTaskByCategory(String filter) {
 		
-		return category; 
-	}
-
-	@Override
-	public Category updateCategory(String name, Long id) {
-
-		Category category = categoryRepository.findById(id).orElse(null);
+		if (filter.equals("all")) {
 		
-		if (category != null) {
+			return taskRepository.findAll();
 			
-			category.setName(name);
-			category = categoryRepository.save(category);
+		} else {
+			
+			return taskRepository.findAllByCategory(filter);
+		}
+	}
+	
+	@Override
+	public List<Schedule> findTaskByDate(TasksRequestDateDao dao) {
+
+		List<Schedule> schedules = new ArrayList<>();
+		
+		ZonedDateTime zonedDate = timeUtils.parseZonedDateTime(dao.getDate()); 
+		Date start = Date.from(zonedDate.with(ChronoField.HOUR_OF_DAY, 0).toInstant());
+		Date end = Date.from(zonedDate.with(ChronoField.HOUR_OF_DAY, 23).toInstant());
+		
+		if (dao.getFilter() == null || dao.getFilter().equalsIgnoreCase("All")) {
+		
+			schedules = scheduleRepository.findByTimeBetweenOrderByTimeAsc(start, end);
+		
+		} else {
+			
+			Category category = categoryRepository.findFirstByNameIgnoreCase(dao.getFilter());
+			schedules = scheduleRepository.findByTimeBetweenAndTaskCategoryOrderByTimeAsc(start, end, category);
 		}
 		
-		return category;
+		return schedules;
 	}
-
+	
 	@Override
-	public Project createProject(String name) {
-
-		Project project = new Project(name);
-		project = projectRepository.save(project); 
+	public List<Schedule> findTaskByDateRange(TasksRequestRangeDao dao) {
 		
-		return project;
-	}
-
-	@Override
-	public Project updateProject(String name, Long id) {
-
-		Project project = projectRepository.findById(id).orElse(null);
+		List<Schedule> schedules = new ArrayList<>();
 		
-		if (project != null) {
+		ZonedDateTime zonedStartDate = timeUtils.parseZonedDateTime(dao.getStartDate()); 
+		ZonedDateTime zonedEndDate = timeUtils.parseZonedDateTime(dao.getEndDate()); 
+		Date start = Date.from(zonedStartDate.with(ChronoField.HOUR_OF_DAY, 0).toInstant());
+		Date end = Date.from(zonedEndDate.with(ChronoField.HOUR_OF_DAY, 23).toInstant());
+		
+		if (dao.getFilter() == null || dao.getFilter().equalsIgnoreCase("All")) {
+		
+			schedules = scheduleRepository.findByTimeBetweenOrderByTimeAsc(start, end);
+		
+		} else {
 			
-			project.setName(name);
-			project = projectRepository.save(project);
+			Category category = categoryRepository.findFirstByNameIgnoreCase(dao.getFilter());
+			schedules = scheduleRepository.findByTimeBetweenAndTaskCategoryOrderByTimeAsc(start, end, category);
 		}
 		
-		return project;
-	}
-
-	@Override
-	public Tag createTag(String name) {
-
-		Tag tag = new Tag(name);
-		tag = tagRepository.save(tag); 
-		
-		return tag;
-	}
-
-	@Override
-	public Tag updateTag(String name, Long id) {
-
-		Tag tag = tagRepository.findById(id).orElse(null);
-		
-		if (tag != null) {
-			
-			tag.setName(name);
-			tag = tagRepository.save(tag);
-		}
-		
-		return tag;
+		return schedules;
 	}
 	
 	@Override
 	public Task createTask(String details) {
-		
-		Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
-        cal.add(Calendar.DAY_OF_MONTH, 7); // Default task due date in 7 days
-        
-        Date due = cal.getTime();
+
+		Date due = new Timestamp(System.currentTimeMillis());
         
 		Task task = new Task(details);
-		task.setCategory(categoryRepository.findFirstByName("Uncategorised"));
-		task.setDue(due); 
-		
+		task.setCategory(categoryRepository.findFirstByNameIgnoreCase("Uncategorised"));
 		task = taskRepository.save(task);
 		
-		return task;
-	}
-
-	@Override
-	public Task completeTask(Long id) {
-		
-		Task task = taskRepository.findById(id).orElse(null);
-		
-		if (task != null) {
-			
-			task.setComplete(true);
-			task = taskRepository.save(task);
-		}
+		Schedule schedule = new Schedule(task, due);
+		scheduleRepository.save(schedule);
 		
 		return task;
 	}
@@ -161,6 +141,20 @@ public class TodosServiceImpl implements TodosService {
 	}
 
 	@Override
+	public Schedule completeScheduledTask(Long id) {
+		
+		Schedule schedule = scheduleRepository.findById(id).orElse(null);
+		
+		if (schedule != null) {
+			
+			schedule.setDone(true);
+			schedule = scheduleRepository.save(schedule);
+		}
+		
+		return schedule;
+	}
+
+	@Override
 	public Task updateTaskPriority(String priority, Long id) {
 
 		Task task = taskRepository.findById(id).orElse(null);
@@ -175,77 +169,19 @@ public class TodosServiceImpl implements TodosService {
 	}
 
 	@Override
-	public Task updateTaskRepeatType(Long id) {
-
-		Task task = taskRepository.findById(id).orElse(null);
+	public void scheduleNonRepeatTasks() {
 		
-		if (task.getRepeat() != null) {
+		List<Task> tasks = taskRepository.findByRepeat(null);
+		
+		for (Task task: tasks) {
 			
-			Repeat repeat = repeatRepository.findById(id).orElse(null);
-			
-			// Get interval in hours
-			Date nextDate = getNextDate(repeat.getCurrent(), repeat.getType(), repeat.getCount());
-			
-			if (nextDate != null) {
-					
-				Task next = new Task(task.getDetails(), nextDate);
-				next.setParent(task.getParent());
-				next.setCategory(task.getCategory());
-				next.setPriority(task.getPriority());
-				next.setProject(task.getProject());
-				next.setTags(task.getTags());
-				next.setRepeat(task.getRepeat());
-				taskRepository.save(next);
-				
-				repeat.setLast(repeat.getCurrent());
-				repeat.setCurrent(nextDate); 
-				repeatRepository.save(repeat);
-				
-				task.setRepeat(null);
-				taskRepository.save(task); 
-			}
+			Schedule schedule = new Schedule(task, Date.from(task.getTarget().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+    		scheduleRepository.save(schedule);
 		}
-		
-		return task;
 	}
 
 	@Override
-	public Task scheduleTaskRepeat(Long id) {
-
-		Task task = taskRepository.findById(id).orElse(null);
-		
-		if (task.getRepeat() != null) {
-			
-			Repeat repeat = repeatRepository.findById(id).orElse(null);
-			
-			// Get interval in hours
-			Date nextDate = getNextDate(repeat.getCurrent(), repeat.getType(), repeat.getCount());
-			
-			if (nextDate != null) {
-					
-				Task next = new Task(task.getDetails(), nextDate);
-				next.setParent(task.getParent());
-				next.setCategory(task.getCategory());
-				next.setPriority(task.getPriority());
-				next.setProject(task.getProject());
-				next.setTags(task.getTags());
-				next.setRepeat(task.getRepeat());
-				taskRepository.save(next);
-				
-				repeat.setLast(repeat.getCurrent());
-				repeat.setCurrent(nextDate); 
-				repeatRepository.save(repeat);
-				
-				task.setRepeat(null);
-				taskRepository.save(task); 
-			}
-		}
-		
-		return task;
-	}
-
-	@Override
-	public void scheduleAllRepeatTasks() {
+	public void scheduleFutureRepeatTasks() {
 
 		List<Task> tasks = taskRepository.findAll();
 		
@@ -253,45 +189,67 @@ public class TodosServiceImpl implements TodosService {
 			
 			if (task.getRepeat() != null) {
 			
-				Task scheduled = scheduleTaskRepeat(task.getId());
-			
-				log.info(dateFormat.format(new Date()) + ": Scheduled repeat task - " + scheduled.getDetails());
+				Integer schedules = scheduleRepeatTask(task.getId(), daysLookAhead);
 				
-			} else {
-				
-				log.info(dateFormat.format(new Date()) + ": Not a Repeat task - " + task.getDetails());
+				log.info("Scheduled " + schedules + " tasks.");
 			}
 		}
 	}
 	
-	private Date getNextDate(Date current, RepeatType type, Integer count) {
+	@Override
+	@Transactional
+	public Integer scheduleRepeatTask(Long id, Integer days) {
+
+		Integer count = 0;
 		
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(current);
+		LocalDate todayDate = LocalDate.now();  
+		LocalDate lastScheduleDate = todayDate.plusDays(days);  
 		
-		if (type == RepeatType.DAYS) {
+		Task task = taskRepository.findById(id).orElse(null);
+		
+		if (task.getRepeat() != null) {
 			
-			calendar.add(Calendar.DATE, count);
-			return calendar.getTime();
+			Repeat repeat = repeatRepository.findById(id).orElse(null);
+			LocalDateTime startDate = repeat.getStart().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+			LocalDate nextDate = startDate.toLocalDate();
 			
-		} else if (type == RepeatType.WEEKS) {
-
-			calendar.add(Calendar.DATE, count*7);
-			return calendar.getTime();
+			if (repeat.getLastRepeat() != null) {
 				
-		} else if (type == RepeatType.MONTHS) {
-
-			calendar.add(Calendar.MONTH, count);
-			return calendar.getTime();
+				nextDate = repeat.getLastRepeat();
+			}
+			
+			while (nextDate.compareTo(lastScheduleDate) < 0) {
 				
-		} else if (type == RepeatType.YEARS) {
-
-			calendar.add(Calendar.YEAR, count);
-			return calendar.getTime();
+				if (nextDate.compareTo(todayDate) > 0) {
 				
+					Schedule schedule = scheduleRepository.findFirstByDateAndTask(nextDate, task);
+					
+					if (schedule == null) {
+
+		        		schedule = new Schedule(task, Date.from(nextDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+		        		scheduleRepository.save(schedule);
+		        		
+		        		count++;
+		        		
+						log.info(nextDate + ": Scheduled repeat task - " + task.getDetails());
+					
+					} else {
+						
+						// Skip! Already scheduled for this date
+					}
+					
+				} else {
+					
+					// Skip! This date is in the past.
+				}
+				
+				nextDate = timeUtils.nextDate(nextDate, repeat.getType(), repeat.getCount());
+			}
+			
+			repeat.setLastRepeat(nextDate);
+			repeatRepository.save(repeat);
 		}
 		
-		return null;
+		return count;
 	}
-
 }
