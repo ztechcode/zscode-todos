@@ -1,6 +1,7 @@
 package org.zafritech.zscode.todos.services.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.zafritech.zscode.todos.data.models.Category;
 import org.zafritech.zscode.todos.data.models.Project;
 import org.zafritech.zscode.todos.data.models.Tag;
@@ -9,6 +10,7 @@ import org.zafritech.zscode.todos.data.repositories.ProjectRepository;
 import org.zafritech.zscode.todos.data.repositories.TagRepository;
 import org.zafritech.zscode.todos.services.CategoryService;
 
+@Service
 public class CategoryServiceImpl implements CategoryService {
 
 	@Autowired

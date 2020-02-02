@@ -23,9 +23,11 @@ import org.zafritech.zscode.todos.data.models.Category;
 import org.zafritech.zscode.todos.data.models.Repeat;
 import org.zafritech.zscode.todos.data.models.Schedule;
 import org.zafritech.zscode.todos.data.models.Task;
+import org.zafritech.zscode.todos.data.models.TaskLog;
 import org.zafritech.zscode.todos.data.repositories.CategoryRepository;
 import org.zafritech.zscode.todos.data.repositories.RepeatRepository;
 import org.zafritech.zscode.todos.data.repositories.ScheduleRepository;
+import org.zafritech.zscode.todos.data.repositories.TaskLogRepository;
 import org.zafritech.zscode.todos.data.repositories.TaskRepository;
 import org.zafritech.zscode.todos.enums.Priority;
 import org.zafritech.zscode.todos.services.TodosService;
@@ -48,6 +50,9 @@ public class TodosServiceImpl implements TodosService {
 	
 	@Autowired
 	private CategoryRepository categoryRepository;
+	
+	@Autowired
+	private TaskLogRepository taskLogRepository;
 
 	private static final Logger log = LoggerFactory.getLogger(ScheduledTasks.class);
 	
@@ -149,6 +154,9 @@ public class TodosServiceImpl implements TodosService {
 			
 			schedule.setDone(true);
 			schedule = scheduleRepository.save(schedule);
+			
+			TaskLog log = new TaskLog(schedule.getTask(), new Date());
+			taskLogRepository.save(log);
 		}
 		
 		return schedule;
