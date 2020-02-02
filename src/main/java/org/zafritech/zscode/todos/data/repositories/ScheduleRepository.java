@@ -17,7 +17,7 @@ public interface ScheduleRepository extends CrudRepository<Schedule, Long> {
 	
 	List<Schedule> findByTaskCategoryNameOrderByTimeAsc(String name);
 	
-	List<Schedule> findByTimeBetweenOrderByTimeAsc(Date start, Date end);
+	List<Schedule> findByTimeBetweenAndDoneOrderByTimeAsc(Date start, Date end, boolean done);
 	
-	List<Schedule> findByTimeBetweenAndTaskCategoryOrderByTimeAsc(Date start, Date end, Category category);
+	List<Schedule> findByTimeBetweenAndTaskCategoryAndDoneOrderByTimeAsc(Date start, Date end, Category category, boolean done);
 }

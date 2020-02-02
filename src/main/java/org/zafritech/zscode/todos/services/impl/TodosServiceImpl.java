@@ -82,12 +82,12 @@ public class TodosServiceImpl implements TodosService {
 		
 		if (dao.getFilter() == null || dao.getFilter().equalsIgnoreCase("All")) {
 		
-			schedules = scheduleRepository.findByTimeBetweenOrderByTimeAsc(start, end);
+			schedules = scheduleRepository.findByTimeBetweenAndDoneOrderByTimeAsc(start, end, false);
 		
 		} else {
 			
 			Category category = categoryRepository.findFirstByNameIgnoreCase(dao.getFilter());
-			schedules = scheduleRepository.findByTimeBetweenAndTaskCategoryOrderByTimeAsc(start, end, category);
+			schedules = scheduleRepository.findByTimeBetweenAndTaskCategoryAndDoneOrderByTimeAsc(start, end, category, false);
 		}
 		
 		return schedules;
@@ -105,12 +105,12 @@ public class TodosServiceImpl implements TodosService {
 		
 		if (dao.getFilter() == null || dao.getFilter().equalsIgnoreCase("All")) {
 		
-			schedules = scheduleRepository.findByTimeBetweenOrderByTimeAsc(start, end);
+			schedules = scheduleRepository.findByTimeBetweenAndDoneOrderByTimeAsc(start, end, false);
 		
 		} else {
 			
 			Category category = categoryRepository.findFirstByNameIgnoreCase(dao.getFilter());
-			schedules = scheduleRepository.findByTimeBetweenAndTaskCategoryOrderByTimeAsc(start, end, category);
+			schedules = scheduleRepository.findByTimeBetweenAndTaskCategoryAndDoneOrderByTimeAsc(start, end, category, false);
 		}
 		
 		return schedules;
