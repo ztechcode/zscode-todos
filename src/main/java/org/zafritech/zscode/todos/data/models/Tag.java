@@ -16,7 +16,7 @@ public class Tag implements Serializable {
     @GeneratedValue
     private Long id;
     
-    private String uuId;
+    private String uuid;
 
     private String name;
 
@@ -26,16 +26,16 @@ public class Tag implements Serializable {
 
 	public Tag(String name) {
 		
-		this.uuId = UUID.randomUUID().toString();
+		this.uuid = UUID.randomUUID().toString();
 		this.name = name;
 	}
 
-	public String getUuId() {
-		return uuId;
+	public String getUuid() {
+		return uuid;
 	}
 
-	public void setUuId(String uuId) {
-		this.uuId = uuId;
+	public void setUuId(String uuid) {
+		this.uuid = uuid;
 	}
 
 	public String getName() {
@@ -56,6 +56,6 @@ public class Tag implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Tag [id=" + id + ", uuId=" + uuId + ", name=" + name + "]";
+		return "Tag [id=" + id + ", uuid=" + uuid + ", name=" + name + "]";
 	}
 }

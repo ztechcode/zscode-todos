@@ -20,7 +20,7 @@ public class TaskDao {
     private boolean complete;
 
     private String project;
-
+    
     private String due;
 
 	public TaskDao() {

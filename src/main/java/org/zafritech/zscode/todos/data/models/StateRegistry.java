@@ -17,7 +17,7 @@ public class StateRegistry implements Serializable {
     @GeneratedValue
     private Long id;
     
-    private String uuId;
+    private String uuid;
     
     private String stateKey;
     
@@ -33,18 +33,18 @@ public class StateRegistry implements Serializable {
 
     public StateRegistry(String stateKey) {
         
-        this.uuId = UUID.randomUUID().toString();
+        this.uuid = UUID.randomUUID().toString();
         this.stateKey = stateKey;
         this.active = false;
         this.created = new Timestamp(System.currentTimeMillis());
     }
 
-	public String getUuId() {
-		return uuId;
+	public String getUuid() {
+		return uuid;
 	}
 
-	public void setUuId(String uuId) {
-		this.uuId = uuId;
+	public void setUuId(String uuid) {
+		this.uuid = uuid;
 	}
 
 	public String getStateKey() {
@@ -85,7 +85,7 @@ public class StateRegistry implements Serializable {
 
 	@Override
 	public String toString() {
-		return "StateRegistry [id=" + id + ", uuId=" + uuId + ", stateKey=" + stateKey + ", active=" + active
+		return "StateRegistry [id=" + id + ", uuid=" + uuid + ", stateKey=" + stateKey + ", active=" + active
 				+ ", created=" + created + ", activated=" + activated + "]";
 	}
 }

@@ -21,9 +21,13 @@ public interface TodosService {
 
 	public Schedule completeScheduledTask(Long id);
 	
-	public List<Schedule> findTaskByDate(TasksRequestDateDao dao);
+	public List<Schedule> findTaskOnDate(TasksRequestDateDao dao);
+	
+	public List<Schedule> findTaskUpToDate(TasksRequestDateDao dao);
 	
 	public List<Schedule> findTaskByDateRange(TasksRequestRangeDao dao);
+	
+	public List<Schedule> findAllTaskByDateRange(TasksRequestRangeDao dao);
 
 	public void scheduleNonRepeatTasks();
 	

@@ -3,8 +3,10 @@ package org.zafritech.zscode.todos.data.models;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -20,6 +22,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
@@ -27,6 +31,7 @@ import javax.validation.constraints.NotNull;
 import org.zafritech.zscode.todos.enums.Priority;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity(name = "ZSCODE_TODOS_TASKS")
 public class Task implements Serializable {
@@ -62,6 +67,12 @@ public class Task implements Serializable {
     @JoinColumn(name = "projectId")
     private Project project;
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "taskId")
+    @JsonManagedReference
+    @OrderBy("created DESC")
+    private List<TaskNote> notes = new ArrayList<>();
+
     @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "ZSCODE_TODOS_TASKTAGS",
             joinColumns = {
@@ -71,16 +82,6 @@ public class Task implements Serializable {
     )
     @JsonBackReference
     private Set<Tag> tags = new HashSet<Tag>();
-
-    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-    @JoinTable(name = "ZSCODE_TODOS_TASKNOTES",
-            joinColumns = {
-                @JoinColumn(name = "taskId", referencedColumnName = "id")},
-            inverseJoinColumns = {
-                @JoinColumn(name = "noteId", referencedColumnName = "id")}
-    )
-    @JsonBackReference
-    private Set<Note> notes = new HashSet<Note>();
 
     private LocalDate target;
     
@@ -151,10 +152,6 @@ public class Task implements Serializable {
 		return tags;
 	}
 
-	public Set<Note> getNotes() {
-		return notes;
-	}
-
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
 	}
@@ -187,12 +184,16 @@ public class Task implements Serializable {
 		this.project = project;
 	}
 
-	public void setTags(Set<Tag> tags) {
-		this.tags = tags;
+	public List<TaskNote> getNotes() {
+		return notes;
 	}
 
-	public void setNotes(Set<Note> notes) {
+	public void setNotes(List<TaskNote> notes) {
 		this.notes = notes;
+	}
+
+	public void setTags(Set<Tag> tags) {
+		this.tags = tags;
 	}
 
 	public LocalDate getTarget() {

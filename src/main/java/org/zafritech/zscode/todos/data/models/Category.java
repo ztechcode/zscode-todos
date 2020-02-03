@@ -16,7 +16,7 @@ public class Category implements Serializable {
     @GeneratedValue
     private Long id;
     
-    private String uuId;
+    private String uuid;
 
     private String name;
 
@@ -26,16 +26,16 @@ public class Category implements Serializable {
 
 	public Category(String name) {
 
-		this.uuId = UUID.randomUUID().toString();
+		this.uuid = UUID.randomUUID().toString();
 		this.name = name;
 	}
 
-	public String getUuId() {
-		return uuId;
+	public String getUuid() {
+		return uuid;
 	}
 
-	public void setUuId(String uuId) {
-		this.uuId = uuId;
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 
 	public String getName() {
@@ -52,6 +52,6 @@ public class Category implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Category [id=" + id + ", uuId=" + uuId + ", name=" + name + "]";
+		return "Category [id=" + id + ", uuid=" + uuid + ", name=" + name + "]";
 	}
 }

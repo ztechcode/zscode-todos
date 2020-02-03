@@ -72,7 +72,7 @@ public class TodosServiceImpl implements TodosService {
 	}
 	
 	@Override
-	public List<Schedule> findTaskByDate(TasksRequestDateDao dao) {
+	public List<Schedule> findTaskOnDate(TasksRequestDateDao dao) {
 
 		List<Schedule> schedules = new ArrayList<>();
 		
@@ -82,12 +82,33 @@ public class TodosServiceImpl implements TodosService {
 		
 		if (dao.getFilter() == null || dao.getFilter().equalsIgnoreCase("All")) {
 		
-			schedules = scheduleRepository.findByTimeBetweenAndDoneOrderByTimeAsc(start, end, false);
+			schedules = scheduleRepository.findByTimeBetweenOrderByTimeAsc(start, end);
 		
 		} else {
 			
 			Category category = categoryRepository.findFirstByNameIgnoreCase(dao.getFilter());
-			schedules = scheduleRepository.findByTimeBetweenAndTaskCategoryAndDoneOrderByTimeAsc(start, end, category, false);
+			schedules = scheduleRepository.findByTimeBetweenAndTaskCategoryOrderByTimeAsc(start, end, category);
+		}
+		
+		return schedules;
+	}
+
+	@Override
+	public List<Schedule> findTaskUpToDate(TasksRequestDateDao dao) {
+
+		List<Schedule> schedules = new ArrayList<>();
+		
+		ZonedDateTime zonedDate = timeUtils.parseZonedDateTime(dao.getDate()); 
+		Date endOfDay = Date.from(zonedDate.with(ChronoField.HOUR_OF_DAY, 23).toInstant());
+		
+		if (dao.getFilter() == null || dao.getFilter().equalsIgnoreCase("All")) {
+		
+			schedules = scheduleRepository.findByTimeLessThanEqualAndDoneOrderByTimeAsc(endOfDay, false);
+		
+		} else {
+			
+			Category category = categoryRepository.findFirstByNameIgnoreCase(dao.getFilter());
+			schedules = scheduleRepository.findByTimeLessThanEqualAndTaskCategoryAndDoneOrderByTimeAsc(endOfDay, category, false);
 		}
 		
 		return schedules;
@@ -111,6 +132,29 @@ public class TodosServiceImpl implements TodosService {
 			
 			Category category = categoryRepository.findFirstByNameIgnoreCase(dao.getFilter());
 			schedules = scheduleRepository.findByTimeBetweenAndTaskCategoryAndDoneOrderByTimeAsc(start, end, category, false);
+		}
+		
+		return schedules;
+	}
+	
+	@Override
+	public List<Schedule> findAllTaskByDateRange(TasksRequestRangeDao dao) {
+		
+		List<Schedule> schedules = new ArrayList<>();
+		
+		ZonedDateTime zonedStartDate = timeUtils.parseZonedDateTime(dao.getStartDate()); 
+		ZonedDateTime zonedEndDate = timeUtils.parseZonedDateTime(dao.getEndDate()); 
+		Date start = Date.from(zonedStartDate.with(ChronoField.HOUR_OF_DAY, 0).toInstant());
+		Date end = Date.from(zonedEndDate.with(ChronoField.HOUR_OF_DAY, 23).toInstant());
+		
+		if (dao.getFilter() == null || dao.getFilter().equalsIgnoreCase("All")) {
+		
+			schedules = scheduleRepository.findByTimeBetweenOrderByTimeAsc(start, end);
+		
+		} else {
+			
+			Category category = categoryRepository.findFirstByNameIgnoreCase(dao.getFilter());
+			schedules = scheduleRepository.findByTimeBetweenAndTaskCategoryOrderByTimeAsc(start, end, category);
 		}
 		
 		return schedules;

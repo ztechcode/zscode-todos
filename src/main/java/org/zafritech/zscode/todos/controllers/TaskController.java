@@ -44,7 +44,15 @@ public class TaskController {
 	@RequestMapping(value = "/date", method = RequestMethod.POST)
 	public ResponseEntity<List<Schedule>> tasksByDate(@RequestBody TasksRequestDateDao dao) {
 		
-		List<Schedule> schedules = todosService.findTaskByDate(dao);
+		List<Schedule> schedules = todosService.findTaskOnDate(dao);
+		
+		return new ResponseEntity<>(schedules, HttpStatus.OK);
+	}	
+	
+	@RequestMapping(value = "/date/inclusive", method = RequestMethod.POST)
+	public ResponseEntity<List<Schedule>> tasksByDateInclusive(@RequestBody TasksRequestDateDao dao) {
+		
+		List<Schedule> schedules = todosService.findTaskUpToDate(dao);
 		
 		return new ResponseEntity<>(schedules, HttpStatus.OK);
 	}	
@@ -56,7 +64,15 @@ public class TaskController {
 		
 		return new ResponseEntity<>(schedules, HttpStatus.OK);
 	}	
-	
+
+	@RequestMapping(value = "/range/inclusive", method = RequestMethod.POST)
+	public ResponseEntity<List<Schedule>> tasksByRangeInclusive(@RequestBody TasksRequestRangeDao dao) {
+		
+		List<Schedule> schedules = todosService.findAllTaskByDateRange(dao);
+		
+		return new ResponseEntity<>(schedules, HttpStatus.OK);
+	}	
+
 	@RequestMapping(value = "/id/{id}", method = RequestMethod.GET)
     public ResponseEntity<Task> getTaskById(@PathVariable(value = "id") Long id) {
 		
