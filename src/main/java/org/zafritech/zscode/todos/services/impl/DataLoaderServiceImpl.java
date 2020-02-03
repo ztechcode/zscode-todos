@@ -4,11 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +21,7 @@ import org.zafritech.zscode.todos.data.models.Repeat;
 import org.zafritech.zscode.todos.data.models.StateRegistry;
 import org.zafritech.zscode.todos.data.models.Tag;
 import org.zafritech.zscode.todos.data.models.Task;
+import org.zafritech.zscode.todos.data.models.TaskTag;
 import org.zafritech.zscode.todos.data.repositories.CategoryRepository;
 import org.zafritech.zscode.todos.data.repositories.RepeatRepository;
 import org.zafritech.zscode.todos.data.repositories.StateRegistryRepository;
@@ -50,7 +50,7 @@ public class DataLoaderServiceImpl implements DataLoaderService {
 	
 	@Autowired
     private TaskRepository taskRepository;
-
+	
 	@Autowired
     private RepeatRepository repeatRepository;
 	
@@ -123,10 +123,6 @@ public class DataLoaderServiceImpl implements DataLoaderService {
 	@Override
 	public void initialiseTasks(String dataFile, String dataKey) throws ParseException {
 
-		Set<Tag> tags = new HashSet<Tag>();
-		tags.add(tagRepository.findFirstByName("ZSCODE"));
-		tags.add(tagRepository.findFirstByName("DABASIR"));
-		
 		ObjectMapper mapper = new ObjectMapper();
 		
 		try {
@@ -155,9 +151,14 @@ public class DataLoaderServiceImpl implements DataLoaderService {
             	task.setPriority(Priority.valueOf(dao.getPriority())); 
             	task.setTarget(target.toLocalDate());
             	task.setRepeat(repeat);
-            	task.setTags(tags);
         		task = taskRepository.save(task);
 
+        		List<TaskTag> tags = new ArrayList<>();
+        		tags.add(new TaskTag(task, tagRepository.findFirstByName("ZSCODE").getName()));
+        		tags.add(new TaskTag(task, tagRepository.findFirstByName("DABASIR").getName()));
+        		task.getTags().addAll(tags);
+        		task = taskRepository.save(task);
+            	
         		logger.info("Initialised task: " + task.getDetails());  
             }
             

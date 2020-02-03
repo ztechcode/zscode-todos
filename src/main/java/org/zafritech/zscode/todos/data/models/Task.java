@@ -5,9 +5,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
@@ -15,12 +13,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
@@ -30,7 +25,6 @@ import javax.validation.constraints.NotNull;
 
 import org.zafritech.zscode.todos.enums.Priority;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity(name = "ZSCODE_TODOS_TASKS")
@@ -73,15 +67,11 @@ public class Task implements Serializable {
     @OrderBy("created DESC")
     private List<TaskNote> notes = new ArrayList<>();
 
-    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-    @JoinTable(name = "ZSCODE_TODOS_TASKTAGS",
-            joinColumns = {
-                @JoinColumn(name = "taskId", referencedColumnName = "id")},
-            inverseJoinColumns = {
-                @JoinColumn(name = "tagId", referencedColumnName = "id")}
-    )
-    @JsonBackReference
-    private Set<Tag> tags = new HashSet<Tag>();
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "taskId")
+    @JsonManagedReference
+    @OrderBy("tag ASC")
+    private List<TaskTag> tags = new ArrayList<>();
 
     private LocalDate target;
     
@@ -148,8 +138,20 @@ public class Task implements Serializable {
 		return project;
 	}
 
-	public Set<Tag> getTags() {
+	public List<TaskNote> getNotes() {
+		return notes;
+	}
+
+	public List<TaskTag> getTags() {
 		return tags;
+	}
+
+	public LocalDate getTarget() {
+		return target;
+	}
+
+	public Date getCreated() {
+		return created;
 	}
 
 	public void setUuid(String uuid) {
@@ -184,28 +186,16 @@ public class Task implements Serializable {
 		this.project = project;
 	}
 
-	public List<TaskNote> getNotes() {
-		return notes;
-	}
-
 	public void setNotes(List<TaskNote> notes) {
 		this.notes = notes;
 	}
 
-	public void setTags(Set<Tag> tags) {
+	public void setTags(List<TaskTag> tags) {
 		this.tags = tags;
-	}
-
-	public LocalDate getTarget() {
-		return target;
 	}
 
 	public void setTarget(LocalDate target) {
 		this.target = target;
-	}
-
-	public Date getCreated() {
-		return created;
 	}
 
 	public void setCreated(Date created) {
@@ -216,6 +206,6 @@ public class Task implements Serializable {
 	public String toString() {
 		return "Task [id=" + id + ", uuid=" + uuid + ", owner=" + owner + ", parent=" + parent + ", details=" + details
 				+ ", repeat=" + repeat + ", priority=" + priority + ", category=" + category + ", project=" + project
-				+ ", tags=" + tags + ", notes=" + notes + ", created=" + created + "]";
+				+ ", notes=" + notes + ", tags=" + tags + ", target=" + target + ", created=" + created + "]";
 	}
 }
