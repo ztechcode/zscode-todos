@@ -1,5 +1,8 @@
 package org.zafritech.zscode.todos.data.daos;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -7,7 +10,7 @@ public class TaskDao {
 
     private Long id;
     
-    private String uuId;
+    private String uuid;
 
     private String details;
 
@@ -22,6 +25,10 @@ public class TaskDao {
     private String project;
     
     private String due;
+    
+    private List<TagDao> tags = new ArrayList<>();
+    
+    private List<TaskNoteDao> notes = new ArrayList<>();
 
 	public TaskDao() {
 
@@ -35,12 +42,12 @@ public class TaskDao {
 		this.id = id;
 	}
 
-	public String getUuId() {
-		return uuId;
+	public String getUuid() {
+		return uuid;
 	}
 
-	public void setUuId(String uuId) {
-		this.uuId = uuId;
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 
 	public String getDetails() {
@@ -99,4 +106,19 @@ public class TaskDao {
 		this.due = due;
 	}
 
+	public List<TagDao> getTags() {
+		return tags;
+	}
+
+	public List<TaskNoteDao> getNotes() {
+		return notes;
+	}
+
+	public void setTags(List<TagDao> tags) {
+		this.tags = tags;
+	}
+
+	public void setNotes(List<TaskNoteDao> notes) {
+		this.notes = notes;
+	}
 }

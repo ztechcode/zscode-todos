@@ -1,9 +1,6 @@
 package org.zafritech.zscode.todos.data.models;
 
 import java.io.Serializable;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.UUID;
 
@@ -12,8 +9,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 @Entity(name = "ZSCODE_TODOS_SCHEDULES")
 public class Schedule implements Serializable {
@@ -28,10 +23,7 @@ public class Schedule implements Serializable {
 
     private String owner;
     
-    private LocalDate date;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date time;
+    private Date deadline;
 
     @ManyToOne
     @JoinColumn(name = "taskId")
@@ -43,21 +35,19 @@ public class Schedule implements Serializable {
     	
     }
 
-	public Schedule(Task task, Date time) {
+	public Schedule(Task task, Date deadline) {
 
 		this.uuid = UUID.randomUUID().toString();
-		this.date = Instant.ofEpochMilli(time.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
-		this.time = time;
+		this.deadline = deadline;
 		this.task = task;
 		this.done = false;
 	}
 
-	public Schedule(Task task, Date time, String owner) {
+	public Schedule(Task task, Date deadline, String owner) {
 
 		this.uuid = UUID.randomUUID().toString();
 		this.owner = owner;
-		this.date = Instant.ofEpochMilli(time.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
-		this.time = time;
+		this.deadline = deadline;
 		this.task = task;
 		this.done = false;
 	}
@@ -72,18 +62,6 @@ public class Schedule implements Serializable {
 
 	public String getOwner() {
 		return owner;
-	}
-
-	public LocalDate getDate() {
-		return date;
-	}
-
-	public void setDate(LocalDate date) {
-		this.date = date;
-	}
-
-	public Date getTime() {
-		return time;
 	}
 
 	public Task getTask() {
@@ -102,10 +80,6 @@ public class Schedule implements Serializable {
 		this.owner = owner;
 	}
 
-	public void setTime(Date time) {
-		this.time = time;
-	}
-
 	public void setTask(Task task) {
 		this.task = task;
 	}
@@ -114,9 +88,17 @@ public class Schedule implements Serializable {
 		this.done = done;
 	}
 
+	public Date getDeadline() {
+		return deadline;
+	}
+
+	public void setDeadline(Date deadline) {
+		this.deadline = deadline;
+	}
+
 	@Override
 	public String toString() {
-		return "Schedule [id=" + id + ", uuid=" + uuid + ", owner=" + owner + ", date=" + date + ", time=" + time
-				+ ", task=" + task + ", done=" + done + "]";
+		return "Schedule [id=" + id + ", uuid=" + uuid + ", owner=" + owner + ", deadline=" + deadline + ", task="
+				+ task + ", done=" + done + "]";
 	}
 }

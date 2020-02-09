@@ -73,7 +73,7 @@ public class Task implements Serializable {
     @OrderBy("tag ASC")
     private List<TaskTag> tags = new ArrayList<>();
 
-    private LocalDate target;
+    private Date deadline;
     
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;
@@ -89,6 +89,7 @@ public class Task implements Serializable {
 		this.details = details;
 		this.priority = Priority.MEDIUM;
 		this.category = null;
+		this.repeat = null;
 		this.created = new Timestamp(System.currentTimeMillis());
 	}
 
@@ -99,6 +100,7 @@ public class Task implements Serializable {
 		this.details = details;
 		this.priority = Priority.MEDIUM;
 		this.category = null;
+		this.repeat = null;
 		this.created = new Timestamp(System.currentTimeMillis());
 	}
 
@@ -146,10 +148,6 @@ public class Task implements Serializable {
 		return tags;
 	}
 
-	public LocalDate getTarget() {
-		return target;
-	}
-
 	public Date getCreated() {
 		return created;
 	}
@@ -194,18 +192,22 @@ public class Task implements Serializable {
 		this.tags = tags;
 	}
 
-	public void setTarget(LocalDate target) {
-		this.target = target;
-	}
-
 	public void setCreated(Date created) {
 		this.created = created;
+	}
+
+	public Date getDeadline() {
+		return deadline;
+	}
+
+	public void setDeadline(Date deadline) {
+		this.deadline = deadline;
 	}
 
 	@Override
 	public String toString() {
 		return "Task [id=" + id + ", uuid=" + uuid + ", owner=" + owner + ", parent=" + parent + ", details=" + details
 				+ ", repeat=" + repeat + ", priority=" + priority + ", category=" + category + ", project=" + project
-				+ ", notes=" + notes + ", tags=" + tags + ", target=" + target + ", created=" + created + "]";
+				+ ", notes=" + notes + ", tags=" + tags + ", deadline=" + deadline + ", created=" + created + "]";
 	}
 }

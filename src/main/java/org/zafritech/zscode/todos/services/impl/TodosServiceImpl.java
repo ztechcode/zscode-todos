@@ -1,7 +1,6 @@
 package org.zafritech.zscode.todos.services.impl;
 
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -17,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.zafritech.zscode.todos.ScheduledTasks;
+import org.zafritech.zscode.todos.data.daos.BasicTaskDao;
 import org.zafritech.zscode.todos.data.daos.TasksRequestDateDao;
 import org.zafritech.zscode.todos.data.daos.TasksRequestRangeDao;
 import org.zafritech.zscode.todos.data.models.Category;
@@ -59,6 +59,53 @@ public class TodosServiceImpl implements TodosService {
 	private static final Integer daysLookAhead = 428;
 	
 	@Override
+	public Task createTask(BasicTaskDao dao) {
+
+		Date due = new Timestamp(System.currentTimeMillis());
+        
+		Task task = new Task(dao.getTask());
+		task.setCategory(categoryRepository.findFirstByNameIgnoreCase("Uncategorised"));
+		task = taskRepository.save(task);
+		
+		Schedule schedule = new Schedule(task, due);
+		scheduleRepository.save(schedule);
+		
+		return task;
+	}
+
+	@Override
+	public Task updateTask(String details, Long id) {
+
+		Task task = taskRepository.findById(id).orElse(null);
+		
+		if (task != null) {
+			
+			task.setDetails(details);
+			task = taskRepository.save(task);
+		}
+		
+		return task;
+	}
+
+	@Override
+	public void deleteTask(Long id) {
+
+		Task task = taskRepository.findById(id).orElse(null);
+		
+		if (task != null) {
+		
+			List<Schedule> schedules = scheduleRepository.findByTask(task);
+			
+			for (Schedule schedule : schedules) {
+				
+				scheduleRepository.delete(schedule);
+			}
+			
+			taskRepository.delete(task); 
+		}
+	}
+		
+	@Override
 	public List<Task> filterTaskByCategory(String filter) {
 		
 		if (filter.equals("all")) {
@@ -82,12 +129,12 @@ public class TodosServiceImpl implements TodosService {
 		
 		if (dao.getFilter() == null || dao.getFilter().equalsIgnoreCase("All")) {
 		
-			schedules = scheduleRepository.findByTimeBetweenOrderByTimeAsc(start, end);
+			schedules = scheduleRepository.findByDeadlineBetweenOrderByDeadlineAsc(start, end);
 		
 		} else {
 			
 			Category category = categoryRepository.findFirstByNameIgnoreCase(dao.getFilter());
-			schedules = scheduleRepository.findByTimeBetweenAndTaskCategoryOrderByTimeAsc(start, end, category);
+			schedules = scheduleRepository.findByDeadlineBetweenAndTaskCategoryOrderByDeadlineAsc(start, end, category);
 		}
 		
 		return schedules;
@@ -103,12 +150,12 @@ public class TodosServiceImpl implements TodosService {
 		
 		if (dao.getFilter() == null || dao.getFilter().equalsIgnoreCase("All")) {
 		
-			schedules = scheduleRepository.findByTimeLessThanEqualAndDoneOrderByTimeAsc(endOfDay, false);
+			schedules = scheduleRepository.findByDeadlineLessThanEqualAndDoneOrderByDeadlineAsc(endOfDay, false);
 		
 		} else {
 			
 			Category category = categoryRepository.findFirstByNameIgnoreCase(dao.getFilter());
-			schedules = scheduleRepository.findByTimeLessThanEqualAndTaskCategoryAndDoneOrderByTimeAsc(endOfDay, category, false);
+			schedules = scheduleRepository.findByDeadlineLessThanEqualAndTaskCategoryAndDoneOrderByDeadlineAsc(endOfDay, category, false);
 		}
 		
 		return schedules;
@@ -126,12 +173,12 @@ public class TodosServiceImpl implements TodosService {
 		
 		if (dao.getFilter() == null || dao.getFilter().equalsIgnoreCase("All")) {
 		
-			schedules = scheduleRepository.findByTimeBetweenAndDoneOrderByTimeAsc(start, end, false);
+			schedules = scheduleRepository.findByDeadlineBetweenAndDoneOrderByDeadlineAsc(start, end, false);
 		
 		} else {
 			
 			Category category = categoryRepository.findFirstByNameIgnoreCase(dao.getFilter());
-			schedules = scheduleRepository.findByTimeBetweenAndTaskCategoryAndDoneOrderByTimeAsc(start, end, category, false);
+			schedules = scheduleRepository.findByDeadlineBetweenAndTaskCategoryAndDoneOrderByDeadlineAsc(start, end, category, false);
 		}
 		
 		return schedules;
@@ -149,44 +196,15 @@ public class TodosServiceImpl implements TodosService {
 		
 		if (dao.getFilter() == null || dao.getFilter().equalsIgnoreCase("All")) {
 		
-			schedules = scheduleRepository.findByTimeBetweenOrderByTimeAsc(start, end);
+			schedules = scheduleRepository.findByDeadlineBetweenOrderByDeadlineAsc(start, end);
 		
 		} else {
 			
 			Category category = categoryRepository.findFirstByNameIgnoreCase(dao.getFilter());
-			schedules = scheduleRepository.findByTimeBetweenAndTaskCategoryOrderByTimeAsc(start, end, category);
+			schedules = scheduleRepository.findByDeadlineBetweenAndTaskCategoryOrderByDeadlineAsc(start, end, category);
 		}
 		
 		return schedules;
-	}
-	
-	@Override
-	public Task createTask(String details) {
-
-		Date due = new Timestamp(System.currentTimeMillis());
-        
-		Task task = new Task(details);
-		task.setCategory(categoryRepository.findFirstByNameIgnoreCase("Uncategorised"));
-		task = taskRepository.save(task);
-		
-		Schedule schedule = new Schedule(task, due);
-		scheduleRepository.save(schedule);
-		
-		return task;
-	}
-
-	@Override
-	public Task updateTask(String details, Long id) {
-
-		Task task = taskRepository.findById(id).orElse(null);
-		
-		if (task != null) {
-			
-			task.setDetails(details);
-			task = taskRepository.save(task);
-		}
-		
-		return task;
 	}
 
 	@Override
@@ -227,7 +245,7 @@ public class TodosServiceImpl implements TodosService {
 		
 		for (Task task: tasks) {
 			
-			Schedule schedule = new Schedule(task, Date.from(task.getTarget().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+			Schedule schedule = new Schedule(task, task.getDeadline());
     		scheduleRepository.save(schedule);
 		}
 	}
@@ -254,8 +272,8 @@ public class TodosServiceImpl implements TodosService {
 
 		Integer count = 0;
 		
-		LocalDate todayDate = LocalDate.now();  
-		LocalDate lastScheduleDate = todayDate.plusDays(days);  
+		LocalDateTime todayDate = LocalDateTime.now();  
+		LocalDateTime lastScheduleDate = todayDate.plusDays(days);  
 		
 		Task task = taskRepository.findById(id).orElse(null);
 		
@@ -263,22 +281,22 @@ public class TodosServiceImpl implements TodosService {
 			
 			Repeat repeat = repeatRepository.findById(id).orElse(null);
 			LocalDateTime startDate = repeat.getStart().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-			LocalDate nextDate = startDate.toLocalDate();
+			LocalDateTime nextDate = startDate;
 			
 			if (repeat.getLastRepeat() != null) {
 				
-				nextDate = repeat.getLastRepeat();
+				nextDate = timeUtils.DateToLocalDateTime(repeat.getLastRepeat());
 			}
 			
 			while (nextDate.compareTo(lastScheduleDate) < 0) {
 				
 				if (nextDate.compareTo(todayDate) > 0) {
 				
-					Schedule schedule = scheduleRepository.findFirstByDateAndTask(nextDate, task);
+					Schedule schedule = scheduleRepository.findFirstByDeadlineAndTask(timeUtils.LocalDateTimeToDate(nextDate), task);
 					
 					if (schedule == null) {
 
-		        		schedule = new Schedule(task, Date.from(nextDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+		        		schedule = new Schedule(task, timeUtils.LocalDateTimeToDate(nextDate));
 		        		scheduleRepository.save(schedule);
 		        		
 		        		count++;
@@ -298,10 +316,11 @@ public class TodosServiceImpl implements TodosService {
 				nextDate = timeUtils.nextDate(nextDate, repeat.getType(), repeat.getCount());
 			}
 			
-			repeat.setLastRepeat(nextDate);
+			repeat.setLastRepeat(timeUtils.LocalDateTimeToDate(nextDate));
 			repeatRepository.save(repeat);
 		}
 		
 		return count;
 	}
+
 }

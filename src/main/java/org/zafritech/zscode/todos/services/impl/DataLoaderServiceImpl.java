@@ -16,17 +16,21 @@ import org.springframework.stereotype.Service;
 import org.zafritech.zscode.todos.data.daos.CategoryDao;
 import org.zafritech.zscode.todos.data.daos.TagDao;
 import org.zafritech.zscode.todos.data.daos.TaskDao;
+import org.zafritech.zscode.todos.data.daos.TaskNoteDao;
 import org.zafritech.zscode.todos.data.models.Category;
 import org.zafritech.zscode.todos.data.models.Repeat;
 import org.zafritech.zscode.todos.data.models.StateRegistry;
 import org.zafritech.zscode.todos.data.models.Tag;
 import org.zafritech.zscode.todos.data.models.Task;
+import org.zafritech.zscode.todos.data.models.TaskNote;
 import org.zafritech.zscode.todos.data.models.TaskTag;
 import org.zafritech.zscode.todos.data.repositories.CategoryRepository;
 import org.zafritech.zscode.todos.data.repositories.RepeatRepository;
 import org.zafritech.zscode.todos.data.repositories.StateRegistryRepository;
 import org.zafritech.zscode.todos.data.repositories.TagRepository;
+import org.zafritech.zscode.todos.data.repositories.TaskNoteRepository;
 import org.zafritech.zscode.todos.data.repositories.TaskRepository;
+import org.zafritech.zscode.todos.data.repositories.TaskTagRepository;
 import org.zafritech.zscode.todos.enums.Priority;
 import org.zafritech.zscode.todos.enums.RepeatType;
 import org.zafritech.zscode.todos.services.DataLoaderService;
@@ -50,6 +54,12 @@ public class DataLoaderServiceImpl implements DataLoaderService {
 	
 	@Autowired
     private TaskRepository taskRepository;
+	
+	@Autowired
+    private TaskTagRepository taskTagRepository;
+	
+	@Autowired
+    private TaskNoteRepository taskNoteRepository;
 	
 	@Autowired
     private RepeatRepository repeatRepository;
@@ -149,15 +159,41 @@ public class DataLoaderServiceImpl implements DataLoaderService {
             	Task task = new Task(dao.getDetails());
             	task.setCategory(categoryRepository.findFirstByNameIgnoreCase(dao.getCategory()));
             	task.setPriority(Priority.valueOf(dao.getPriority())); 
-            	task.setTarget(target.toLocalDate());
+            	task.setDeadline(timeUtils.ZonedDateTimeToDate(target));
             	task.setRepeat(repeat);
         		task = taskRepository.save(task);
 
-        		List<TaskTag> tags = new ArrayList<>();
-        		tags.add(new TaskTag(task, tagRepository.findFirstByName("ZSCODE").getName()));
-        		tags.add(new TaskTag(task, tagRepository.findFirstByName("DABASIR").getName()));
-        		task.getTags().addAll(tags);
-        		task = taskRepository.save(task);
+        		if (!dao.getTags().isEmpty()) {
+        		
+        			List<TaskTag> tags = new ArrayList<>();
+        			List<TagDao> tagDaos = dao.getTags();
+        			
+        			for (TagDao tagDao : tagDaos) {
+        				
+        				TaskTag taskTag = taskTagRepository.save(new TaskTag(task, tagDao.getName()));
+        				logger.info("\n\nSaved task tag: " + taskTag.getTag());
+        				tags.add(taskTag);
+        			}
+        			
+	        		task.getTags().addAll(tags);
+	        		task = taskRepository.save(task);
+        		}
+        		
+        		if (!dao.getNotes().isEmpty()) {
+            		
+        			List<TaskNote> notes = new ArrayList<>();
+        			List<TaskNoteDao> noteDaos = dao.getNotes();
+        			
+        			for (TaskNoteDao noteDao : noteDaos) {
+        			
+        				TaskNote taskNote = taskNoteRepository.save(new TaskNote(task, noteDao.getNote()));
+        				logger.info("\n\nSaved task note: " + taskNote.getNote()); 
+        				notes.add(taskNote);
+        			}
+        			
+        			task.getNotes().addAll(notes);
+	        		task = taskRepository.save(task);
+        		}
             	
         		logger.info("Initialised task: " + task.getDetails());  
             }

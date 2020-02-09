@@ -1,6 +1,5 @@
 package org.zafritech.zscode.todos.utils;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.ZoneId;
@@ -20,6 +19,21 @@ public class TimeUtils {
 	public TimeUtils() {
 		
 		TimeZone.setDefault(timeZone);
+	}
+	
+	public Date LocalDateTimeToDate(LocalDateTime dateTime) {
+		
+		return java.util.Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant());
+	}
+	
+	public Date ZonedDateTimeToDate(ZonedDateTime zonedDateTime) {
+		
+		return java.util.Date.from(zonedDateTime.toInstant());
+	}
+	
+	public LocalDateTime DateToLocalDateTime(Date date) {
+		
+		return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 	}
 	
 	public LocalDateTime parseDateTime(String dateTime) {
@@ -47,7 +61,7 @@ public class TimeUtils {
 		return ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
 	}
 	
-	public LocalDate nextDate(LocalDate dateTime, RepeatType type, Integer count) {
+	public LocalDateTime nextDate(LocalDateTime dateTime, RepeatType type, Integer count) {
 		
 		if (type == RepeatType.HOURS) {
 			

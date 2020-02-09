@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import org.zafritech.zscode.todos.data.daos.BasicTaskDao;
 import org.zafritech.zscode.todos.data.daos.TasksRequestDateDao;
 import org.zafritech.zscode.todos.data.daos.TasksRequestRangeDao;
 import org.zafritech.zscode.todos.data.models.Schedule;
@@ -36,11 +37,19 @@ public class TaskController {
 	@RequestMapping(value = {"/", ""}, method = RequestMethod.GET)
     public ResponseEntity<List<Schedule>> fetchAllTasks() {
 		
-		List<Schedule> schedules = scheduleRepository.findAllByOrderByTimeAsc(); 
+		List<Schedule> schedules = scheduleRepository.findAllByOrderByDeadlineAsc(); 
 		
 		return new ResponseEntity<>(schedules, HttpStatus.OK);
 	}	
-	
+
+	@RequestMapping(value = "/task/save", method = RequestMethod.POST)
+	public ResponseEntity<Task> createTask(@RequestBody BasicTaskDao dao) { 
+		
+		Task task = todosService.createTask(dao);
+		
+		return new ResponseEntity<>(task, HttpStatus.OK);
+	}
+		
 	@RequestMapping(value = "/date", method = RequestMethod.POST)
 	public ResponseEntity<List<Schedule>> tasksByDate(@RequestBody TasksRequestDateDao dao) {
 		
@@ -86,14 +95,6 @@ public class TaskController {
 		return new ResponseEntity<>(task, HttpStatus.OK);
     }
 	
-	@RequestMapping(value = "/task/save", method = RequestMethod.POST)
-	public ResponseEntity<Task> createTask(@RequestParam("details") String details) { 
-		
-		Task task = todosService.createTask(details);
-		
-		return new ResponseEntity<>(task, HttpStatus.OK);
-	}
-	
 	@RequestMapping(value = "/task/complete/{id}", method = RequestMethod.PUT)
 	public ResponseEntity<Schedule> completeScheduledTask(@PathVariable(value = "id") Long id) { 
 		
@@ -120,16 +121,27 @@ public class TaskController {
 		return new ResponseEntity<>(task, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/task/delete/{id}", method = RequestMethod.PUT)
+	@RequestMapping(value = "/task/delete/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity<?> deleteTask(@PathVariable(value = "id") Long id) { 
 		
 		Task task = taskRepository.findById(id).orElse(null);
 		
 		if (task != null) {
 			
-			taskRepository.delete(task); 
-		}
+			new Thread()
+			{
+			    public void run() {
+			    	
+			    	todosService.deleteTask(id); 
+			    }
+			    
+			}.start();
+
+			return new ResponseEntity<>(HttpStatus.ACCEPTED);
+			
+		} else {
 		
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
 	}
 }

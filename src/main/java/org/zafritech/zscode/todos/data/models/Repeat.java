@@ -1,7 +1,6 @@
 package org.zafritech.zscode.todos.data.models;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.UUID;
 
@@ -34,7 +33,7 @@ public class Repeat implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
 	private Date start;
     
-    private LocalDate lastRepeat;
+    private Date lastRepeat;
 
 	public Repeat() {
 		
@@ -83,12 +82,12 @@ public class Repeat implements Serializable {
 	public void setStart(Date start) {
 		this.start = start;
 	}
-	
-	public LocalDate getLastRepeat() {
+
+	public Date getLastRepeat() {
 		return lastRepeat;
 	}
 
-	public void setLastRepeat(LocalDate lastRepeat) {
+	public void setLastRepeat(Date lastRepeat) {
 		this.lastRepeat = lastRepeat;
 	}
 
@@ -97,5 +96,4 @@ public class Repeat implements Serializable {
 		return "Repeat [id=" + id + ", uuid=" + uuid + ", type=" + type + ", count=" + count + ", start=" + start
 				+ ", lastRepeat=" + lastRepeat + "]";
 	}
-
 }

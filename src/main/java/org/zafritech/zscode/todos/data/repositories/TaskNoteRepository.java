@@ -5,4 +5,5 @@ import org.zafritech.zscode.todos.data.models.TaskNote;
 
 public interface TaskNoteRepository extends CrudRepository<TaskNote, Long> {
 
+	TaskNote findFirstByNote(String note);
 }
