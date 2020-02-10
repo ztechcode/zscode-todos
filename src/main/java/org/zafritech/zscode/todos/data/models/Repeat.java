@@ -29,6 +29,8 @@ public class Repeat implements Serializable {
     private RepeatType type;
 	
 	private Integer count;
+	
+	private String cron;
 
     @Temporal(TemporalType.TIMESTAMP)
 	private Date start;
@@ -79,6 +81,14 @@ public class Repeat implements Serializable {
 		this.count = count;
 	}
 
+	public String getCron() {
+		return cron;
+	}
+
+	public void setCron(String cron) {
+		this.cron = cron;
+	}
+
 	public void setStart(Date start) {
 		this.start = start;
 	}
@@ -93,7 +103,7 @@ public class Repeat implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Repeat [id=" + id + ", uuid=" + uuid + ", type=" + type + ", count=" + count + ", start=" + start
-				+ ", lastRepeat=" + lastRepeat + "]";
+		return "Repeat [id=" + id + ", uuid=" + uuid + ", type=" + type + ", count=" + count + ", cron=" + cron
+				+ ", start=" + start + ", lastRepeat=" + lastRepeat + "]";
 	}
 }

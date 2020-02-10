@@ -6,5 +6,5 @@ public enum RepeatType {
 	DAYS,
 	WEEKS,
 	MONTHS,
-	YEARS
+	YEARS,
 }
