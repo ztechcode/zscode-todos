@@ -90,6 +90,7 @@ public class Task implements Serializable {
 		this.priority = Priority.MEDIUM;
 		this.category = null;
 		this.repeat = null;
+		this.deadline = new Timestamp(System.currentTimeMillis());
 		this.created = new Timestamp(System.currentTimeMillis());
 	}
 
@@ -101,6 +102,7 @@ public class Task implements Serializable {
 		this.priority = Priority.MEDIUM;
 		this.category = null;
 		this.repeat = null;
+		this.deadline = new Timestamp(System.currentTimeMillis());
 		this.created = new Timestamp(System.currentTimeMillis());
 	}
 
