@@ -306,6 +306,8 @@ public class TodosServiceImpl implements TodosService {
 			
 			Repeat repeat = repeatRepository.findById(id).orElse(null);
 			
+			System.out.println("\n\nStart date: " + repeat.getStart());
+			
 			LocalDateTime startDate = timeUtils.DateToLocalDateTime(repeat.getStart());
 			LocalDateTime nextDate = startDate;
 			weekDays = repeat.getDays();
@@ -411,4 +413,5 @@ public class TodosServiceImpl implements TodosService {
 		
 		return taskRepository.save(task);
 	}
+	
 }

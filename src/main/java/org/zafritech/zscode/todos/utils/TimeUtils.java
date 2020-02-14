@@ -2,6 +2,7 @@ package org.zafritech.zscode.todos.utils;
 
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -91,6 +92,21 @@ public class TimeUtils {
 			}
 			
 			return null;
+			
+		} else if (type == RepeatType.DAY_OF_MONTH) {
+
+			LocalDateTime thisFirstDayTime = dateTime.withDayOfMonth(1);
+			LocalDateTime nextFirstDayTime = thisFirstDayTime.plusMonths(1); 
+			YearMonth nextMonth = YearMonth.from(nextFirstDayTime);
+				
+			if (count == 31) {
+				
+				return nextMonth.atEndOfMonth().atTime(thisFirstDayTime.getHour(), thisFirstDayTime.getMinute());
+				
+			} else {
+				
+				return nextMonth.atDay(count).atTime(thisFirstDayTime.getHour(), thisFirstDayTime.getMinute());
+			}
 			
 		} else if (type == RepeatType.MONTHS) {
 			
