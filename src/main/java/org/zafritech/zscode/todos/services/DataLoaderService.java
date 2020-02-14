@@ -11,7 +11,5 @@ public interface DataLoaderService {
 
 	public void initialiseCategories(String dataFile, String dataKey);
 	
-	public void initialiseTags(String dataFile, String dataKey);
-	
 	public void initialiseTasks(String dataFile, String dataKey) throws ParseException;
 }

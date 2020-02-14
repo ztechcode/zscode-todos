@@ -3,7 +3,7 @@ package org.zafritech.zscode.todos.services;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-import org.zafritech.zscode.todos.data.daos.BasicTaskDao;
+import org.zafritech.zscode.todos.data.daos.TaskDao;
 import org.zafritech.zscode.todos.data.daos.TasksRequestDateDao;
 import org.zafritech.zscode.todos.data.daos.TasksRequestRangeDao;
 import org.zafritech.zscode.todos.data.models.Schedule;
@@ -14,7 +14,7 @@ public interface TodosService {
 
 	public List<Task> filterTaskByCategory(String filter);
 	
-	public Task createTask(BasicTaskDao dao);
+	public Task createTask(TaskDao dao);
 	
 	public Task updateTask(String details, Long id);
 	
@@ -37,4 +37,12 @@ public interface TodosService {
 	public void scheduleFutureRepeatTasks();
 	
 	public Integer scheduleRepeatTask(Long id, Integer days);
+	
+	public String[] getTags();
+	
+	public Task setCategory(Long taskId, Long categoryId);
+	
+	public Task addTag(Long id, String tag);
+	
+	public Task addNote(Long id, String note);
 }

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-import org.zafritech.zscode.todos.data.daos.BasicTaskDao;
+import org.zafritech.zscode.todos.data.daos.TaskDao;
 import org.zafritech.zscode.todos.data.daos.TasksRequestDateDao;
 import org.zafritech.zscode.todos.data.daos.TasksRequestRangeDao;
 import org.zafritech.zscode.todos.data.models.Schedule;
@@ -43,7 +43,7 @@ public class TaskController {
 	}	
 
 	@RequestMapping(value = "/task/save", method = RequestMethod.POST)
-	public ResponseEntity<Task> createTask(@RequestBody BasicTaskDao dao) { 
+	public ResponseEntity<Task> createTask(@RequestBody TaskDao dao) { 
 		
 		Task task = todosService.createTask(dao);
 		

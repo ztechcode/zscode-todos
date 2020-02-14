@@ -6,6 +6,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 import org.springframework.stereotype.Component;
@@ -40,7 +41,7 @@ public class TimeUtils {
 		
 		return LocalDateTime.parse(dateTime);
 	}
-	
+
 	public ZonedDateTime parseZonedDateTime(String dateTime) {
 		
 		return ZonedDateTime.parse(dateTime);
@@ -61,7 +62,7 @@ public class TimeUtils {
 		return ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
 	}
 	
-	public LocalDateTime nextDate(LocalDateTime dateTime, RepeatType type, Integer count) {
+	public LocalDateTime nextDate(LocalDateTime dateTime, RepeatType type, Integer count, List<String> weekDays) {
 		
 		if (type == RepeatType.HOURS) {
 			
@@ -72,8 +73,24 @@ public class TimeUtils {
 			return dateTime.plus(Period.ofDays(count)); 
 				
 		} else if (type == RepeatType.WEEKS) {
-
-			return dateTime.plus(Period.ofWeeks(count));
+			
+			if (!weekDays.isEmpty()) {
+				
+				LocalDateTime next = dateTime;
+				
+				for (Integer d = 1; d < 7; d++) {
+					
+					next = next.plusDays(1);
+				
+					if (weekDays.contains(next.getDayOfWeek().name().substring(0, 3).toUpperCase())) {
+						
+						return next;
+					}
+				}
+				
+			}
+			
+			return null;
 			
 		} else if (type == RepeatType.MONTHS) {
 			

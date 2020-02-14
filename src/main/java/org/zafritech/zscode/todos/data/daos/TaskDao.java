@@ -24,7 +24,7 @@ public class TaskDao {
 
     private String project;
     
-    private String due;
+    private String deadline;
     
     private List<TagDao> tags = new ArrayList<>();
     
@@ -98,12 +98,12 @@ public class TaskDao {
 		this.project = project;
 	}
 
-	public String getDue() {
-		return due;
+	public String getDeadline() {
+		return deadline;
 	}
 
-	public void setDue(String due) {
-		this.due = due;
+	public void setDeadline(String deadline) {
+		this.deadline = deadline;
 	}
 
 	public List<TagDao> getTags() {

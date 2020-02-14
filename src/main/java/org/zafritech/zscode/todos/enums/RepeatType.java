@@ -5,6 +5,7 @@ public enum RepeatType {
 	HOURS,
 	DAYS,
 	WEEKS,
+	DAY_OF_MONTH,
 	MONTHS,
 	YEARS,
 }

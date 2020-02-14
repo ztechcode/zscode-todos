@@ -2,8 +2,10 @@ package org.zafritech.zscode.todos.data.models;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -12,14 +14,15 @@ import javax.persistence.Id;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.zafritech.zscode.todos.data.converters.StringListConverter;
 import org.zafritech.zscode.todos.enums.RepeatType;
 
 @Entity(name = "ZSCODE_TODOS_REPEATS")
 public class Repeat implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 8285268136943603670L;
 
-    @Id
+	@Id
     @GeneratedValue
     private Long id;
     
@@ -30,12 +33,14 @@ public class Repeat implements Serializable {
 	
 	private Integer count;
 	
-	private String cron;
-
     @Temporal(TemporalType.TIMESTAMP)
 	private Date start;
     
-    private Date lastRepeat;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date last;
+
+    @Convert(converter = StringListConverter.class)
+    private List<String> days;
 
 	public Repeat() {
 		
@@ -69,6 +74,14 @@ public class Repeat implements Serializable {
 		return start;
 	}
 
+	public Date getLast() {
+		return last;
+	}
+
+	public List<String> getDays() {
+		return days;
+	}
+
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
 	}
@@ -81,29 +94,21 @@ public class Repeat implements Serializable {
 		this.count = count;
 	}
 
-	public String getCron() {
-		return cron;
-	}
-
-	public void setCron(String cron) {
-		this.cron = cron;
-	}
-
 	public void setStart(Date start) {
 		this.start = start;
 	}
 
-	public Date getLastRepeat() {
-		return lastRepeat;
+	public void setLast(Date last) {
+		this.last = last;
 	}
 
-	public void setLastRepeat(Date lastRepeat) {
-		this.lastRepeat = lastRepeat;
+	public void setDays(List<String> days) {
+		this.days = days;
 	}
 
 	@Override
 	public String toString() {
-		return "Repeat [id=" + id + ", uuid=" + uuid + ", type=" + type + ", count=" + count + ", cron=" + cron
-				+ ", start=" + start + ", lastRepeat=" + lastRepeat + "]";
+		return "Repeat [id=" + id + ", uuid=" + uuid + ", type=" + type + ", count=" + count + ", start=" + start
+				+ ", last=" + last + ", days=" + days + "]";
 	}
 }

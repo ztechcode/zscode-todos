@@ -1,13 +1,12 @@
 package org.zafritech.zscode.todos.services.impl;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.transaction.Transactional;
 
@@ -15,8 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.zafritech.zscode.todos.ScheduledTasks;
-import org.zafritech.zscode.todos.data.daos.BasicTaskDao;
+import org.zafritech.zscode.todos.data.daos.TaskDao;
 import org.zafritech.zscode.todos.data.daos.TasksRequestDateDao;
 import org.zafritech.zscode.todos.data.daos.TasksRequestRangeDao;
 import org.zafritech.zscode.todos.data.models.Category;
@@ -24,12 +22,16 @@ import org.zafritech.zscode.todos.data.models.Repeat;
 import org.zafritech.zscode.todos.data.models.Schedule;
 import org.zafritech.zscode.todos.data.models.Task;
 import org.zafritech.zscode.todos.data.models.TaskLog;
+import org.zafritech.zscode.todos.data.models.TaskNote;
 import org.zafritech.zscode.todos.data.repositories.CategoryRepository;
 import org.zafritech.zscode.todos.data.repositories.RepeatRepository;
 import org.zafritech.zscode.todos.data.repositories.ScheduleRepository;
 import org.zafritech.zscode.todos.data.repositories.TaskLogRepository;
+import org.zafritech.zscode.todos.data.repositories.TaskNoteRepository;
 import org.zafritech.zscode.todos.data.repositories.TaskRepository;
 import org.zafritech.zscode.todos.enums.Priority;
+import org.zafritech.zscode.todos.enums.RepeatType;
+import org.zafritech.zscode.todos.enums.Tags;
 import org.zafritech.zscode.todos.services.TodosService;
 import org.zafritech.zscode.todos.utils.TimeUtils;
 
@@ -54,22 +56,44 @@ public class TodosServiceImpl implements TodosService {
 	@Autowired
 	private TaskLogRepository taskLogRepository;
 
-	private static final Logger log = LoggerFactory.getLogger(ScheduledTasks.class);
+	@Autowired
+    private TaskNoteRepository taskNoteRepository;
 	
+    private static final Logger logger = LoggerFactory.getLogger(DataLoaderServiceImpl.class);
+
 	private static final Integer daysLookAhead = 428;
 	
 	@Override
-	public Task createTask(BasicTaskDao dao) {
+	@Transactional
+	public Task createTask(TaskDao dao) {
+		
+		Repeat repeat = null;
+		ZonedDateTime deadline = ZonedDateTime.parse(dao.getDeadline());
+		
+		if (dao.getRepeat() != null) {
+    		
+    		ZonedDateTime start = timeUtils.parseZonedDateTime(dao.getRepeat().getStart()); 
+    		ZonedDateTime last = dao.getRepeat().getLast() == null ? start : timeUtils.parseZonedDateTime(dao.getRepeat().getLast()); 
+    		RepeatType type = RepeatType.valueOf(dao.getRepeat().getType());
+    		Integer count = dao.getRepeat().getCount();
+    		
+    		repeat = new Repeat(type, count, Date.from(start.toInstant())); 
+    		repeat.setLast(Date.from(last.toInstant()));
+    		repeat.setDays(dao.getRepeat().getDays()); 
+    		
+    		repeat = repeatRepository.save(repeat);
+		}
 
-		Date due = new Timestamp(System.currentTimeMillis());
-        
-		Task task = new Task(dao.getTask());
-		task.setCategory(categoryRepository.findFirstByNameIgnoreCase("Uncategorised"));
+		Task task = new Task(dao.getDetails(), timeUtils.ZonedDateTimeToDate(deadline));
+    	task.setPriority(Priority.valueOf(dao.getPriority())); 
+    	task.setDeadline(timeUtils.ZonedDateTimeToDate(deadline));
+    	task.setRepeat(repeat);
+    	
 		task = taskRepository.save(task);
 		
-		Schedule schedule = new Schedule(task, due);
+		Schedule schedule = new Schedule(task, timeUtils.ZonedDateTimeToDate(deadline));
 		scheduleRepository.save(schedule);
-		
+
 		return task;
 	}
 
@@ -261,7 +285,7 @@ public class TodosServiceImpl implements TodosService {
 			
 				Integer schedules = scheduleRepeatTask(task.getId(), daysLookAhead);
 				
-				log.info("Scheduled " + schedules + " tasks.");
+				logger.info("Scheduled " + schedules + " tasks.");
 			}
 		}
 	}
@@ -276,51 +300,115 @@ public class TodosServiceImpl implements TodosService {
 		LocalDateTime lastScheduleDate = todayDate.plusDays(days);  
 		
 		Task task = taskRepository.findById(id).orElse(null);
+		List<String> weekDays = new ArrayList<>();
 		
 		if (task.getRepeat() != null) {
 			
 			Repeat repeat = repeatRepository.findById(id).orElse(null);
-			LocalDateTime startDate = repeat.getStart().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-			LocalDateTime nextDate = startDate;
 			
-			if (repeat.getLastRepeat() != null) {
+			LocalDateTime startDate = timeUtils.DateToLocalDateTime(repeat.getStart());
+			LocalDateTime nextDate = startDate;
+			weekDays = repeat.getDays();
+			
+			if (repeat.getLast() != null) {
 				
-				nextDate = timeUtils.DateToLocalDateTime(repeat.getLastRepeat());
+				nextDate = timeUtils.DateToLocalDateTime(repeat.getLast());
 			}
 			
-			while (nextDate.compareTo(lastScheduleDate) < 0) {
+			if(nextDate != null) {
 				
-				if (nextDate.compareTo(todayDate) > 0) {
-				
-					Schedule schedule = scheduleRepository.findFirstByDeadlineAndTask(timeUtils.LocalDateTimeToDate(nextDate), task);
+				while (nextDate.compareTo(lastScheduleDate) < 0) {
 					
-					if (schedule == null) {
-
-		        		schedule = new Schedule(task, timeUtils.LocalDateTimeToDate(nextDate));
-		        		scheduleRepository.save(schedule);
-		        		
-		        		count++;
-		        		
-						log.info(nextDate + ": Scheduled repeat task - " + task.getDetails());
+					if (nextDate.compareTo(todayDate) > 0) {
 					
+						Schedule schedule = scheduleRepository.findFirstByDeadlineAndTask(timeUtils.LocalDateTimeToDate(nextDate), task);
+						
+						if (schedule == null) {
+							
+			        		schedule = new Schedule(task, timeUtils.LocalDateTimeToDate(nextDate));
+			        		scheduleRepository.save(schedule);
+			        		
+			        		count++;
+			        		
+			        		logger.info(nextDate + ": Scheduled repeat task - " + task.getDetails());
+						
+						} else {
+							
+							// Skip! Already scheduled for this date
+						}
+						
 					} else {
 						
-						// Skip! Already scheduled for this date
+						// Skip! This date is in the past.
 					}
 					
-				} else {
-					
-					// Skip! This date is in the past.
+					nextDate = timeUtils.nextDate(nextDate, repeat.getType(), repeat.getCount(), weekDays);
 				}
 				
-				nextDate = timeUtils.nextDate(nextDate, repeat.getType(), repeat.getCount());
+				repeat.setLast(timeUtils.LocalDateTimeToDate(nextDate));
+				repeatRepository.save(repeat);		
 			}
-			
-			repeat.setLastRepeat(timeUtils.LocalDateTimeToDate(nextDate));
-			repeatRepository.save(repeat);
 		}
 		
 		return count;
 	}
 
+	@Override
+	@Transactional
+	public String[] getTags() {
+
+    	String[] stringTags = Stream.of(Tags.values()).map(Tags::name).toArray(String[]::new);
+
+    	return stringTags;
+	}
+
+	@Override
+	@Transactional
+	public Task setCategory(Long taskId, Long categoryId) {
+
+		Task task = taskRepository.findById(taskId).orElse(null);
+		Category category = categoryRepository.findById(categoryId).orElse(null);
+		
+		if ((task != null) && (category != null)) {
+			
+			task.setCategory(category); 
+		}
+		
+		return task;
+	}
+
+	@Override
+	@Transactional
+	public Task addTag(Long id, String tag) {
+		
+		List<String> tags = new ArrayList<>();
+		Task task = taskRepository.findById(id).orElse(null);
+		tags.addAll(task.getTags());
+		
+		if (task != null) {
+		
+			tags.add(tag);
+			task.setTags(tags);
+		}
+		
+		return taskRepository.save(task); 
+	}
+
+	@Override
+	@Transactional
+	public Task addNote(Long id, String note) {
+		
+		
+		Task task = taskRepository.findById(id).orElse(null);
+		
+		if (task != null) {
+			
+			List<TaskNote> notes = task.getNotes();
+			TaskNote taskNote = taskNoteRepository.save(new TaskNote(task, note));
+			notes.add(taskNote);
+			task.setNotes(notes); 
+		}
+		
+		return taskRepository.save(task);
+	}
 }

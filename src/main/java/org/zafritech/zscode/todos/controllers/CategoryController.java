@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.zafritech.zscode.todos.data.models.Category;
 import org.zafritech.zscode.todos.data.repositories.CategoryRepository;
 import org.zafritech.zscode.todos.services.CategoryService;
+import org.zafritech.zscode.todos.services.TodosService;
 
 @RestController
 @RequestMapping("/categories")
@@ -24,6 +25,9 @@ public class CategoryController {
 
 	@Autowired
 	private CategoryService categoryService;
+
+	@Autowired
+	private TodosService todosService;
 
 	@RequestMapping(value = {"/", ""}, method = RequestMethod.GET)
     public ResponseEntity<List<Category>> fetchAllCategories() {
@@ -76,4 +80,13 @@ public class CategoryController {
 		
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
+
+	@RequestMapping(value = "tags", method = RequestMethod.GET)
+    public ResponseEntity<String[]> geTags() {
+		
+		String[] tags = todosService.getTags(); 
+	
+		return new ResponseEntity<>(tags, HttpStatus.OK);
+    }
+	
 }

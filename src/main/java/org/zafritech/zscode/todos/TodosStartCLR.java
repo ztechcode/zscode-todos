@@ -25,10 +25,10 @@ public class TodosStartCLR implements CommandLineRunner {
 			dataLoader.initialiseCategories(configProps.getPaths().getDataDir() +  "init/categories.json", "TODOS_CATEGORIES_INIT"); 
 		}
 		
-		if (!dataLoader.isInitialised("TODOS_TAGS_INIT")) { 
-			
-			dataLoader.initialiseTags(configProps.getPaths().getDataDir() +  "init/tags.json", "TODOS_TAGS_INIT"); 
-		}
+//		if (!dataLoader.isInitialised("TODOS_TAGS_INIT")) { 
+//			
+//			dataLoader.initialiseTags(configProps.getPaths().getDataDir() +  "init/tags.json", "TODOS_TAGS_INIT"); 
+//		}
 		
 		if (!dataLoader.isInitialised("TODOS_TASKS_INIT")) { 
 			

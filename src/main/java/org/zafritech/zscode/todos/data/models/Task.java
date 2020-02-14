@@ -2,14 +2,15 @@ package org.zafritech.zscode.todos.data.models;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -67,11 +68,10 @@ public class Task implements Serializable {
     @OrderBy("created DESC")
     private List<TaskNote> notes = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "taskId")
-    @JsonManagedReference
-    @OrderBy("tag ASC")
-    private List<TaskTag> tags = new ArrayList<>();
+    @ElementCollection
+    @Column(name="tags")
+    @CollectionTable(name="ZSCODE_TODOS_TASK_TAGS", joinColumns= {@JoinColumn(name="taskId")})
+    private List<String> tags = new ArrayList<>();
 
     private Date deadline;
     
@@ -94,7 +94,7 @@ public class Task implements Serializable {
 		this.created = new Timestamp(System.currentTimeMillis());
 	}
 
-	public Task(String details, LocalDate target) {
+	public Task(String details, Date deadline) {
 	
 		this.uuid = UUID.randomUUID().toString();
 		this.parent = null;
@@ -102,7 +102,7 @@ public class Task implements Serializable {
 		this.priority = Priority.MEDIUM;
 		this.category = null;
 		this.repeat = null;
-		this.deadline = new Timestamp(System.currentTimeMillis());
+		this.deadline = deadline;
 		this.created = new Timestamp(System.currentTimeMillis());
 	}
 
@@ -146,10 +146,6 @@ public class Task implements Serializable {
 		return notes;
 	}
 
-	public List<TaskTag> getTags() {
-		return tags;
-	}
-
 	public Date getCreated() {
 		return created;
 	}
@@ -190,7 +186,11 @@ public class Task implements Serializable {
 		this.notes = notes;
 	}
 
-	public void setTags(List<TaskTag> tags) {
+	public List<String> getTags() {
+		return tags;
+	}
+
+	public void setTags(List<String> tags) {
 		this.tags = tags;
 	}
 

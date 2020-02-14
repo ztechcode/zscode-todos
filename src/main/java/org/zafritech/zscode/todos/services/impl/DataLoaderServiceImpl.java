@@ -3,10 +3,7 @@ package org.zafritech.zscode.todos.services.impl;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -18,25 +15,13 @@ import org.zafritech.zscode.todos.data.daos.TagDao;
 import org.zafritech.zscode.todos.data.daos.TaskDao;
 import org.zafritech.zscode.todos.data.daos.TaskNoteDao;
 import org.zafritech.zscode.todos.data.models.Category;
-import org.zafritech.zscode.todos.data.models.Repeat;
 import org.zafritech.zscode.todos.data.models.StateRegistry;
-import org.zafritech.zscode.todos.data.models.Tag;
 import org.zafritech.zscode.todos.data.models.Task;
-import org.zafritech.zscode.todos.data.models.TaskNote;
-import org.zafritech.zscode.todos.data.models.TaskTag;
 import org.zafritech.zscode.todos.data.repositories.CategoryRepository;
-import org.zafritech.zscode.todos.data.repositories.RepeatRepository;
 import org.zafritech.zscode.todos.data.repositories.StateRegistryRepository;
-import org.zafritech.zscode.todos.data.repositories.TagRepository;
-import org.zafritech.zscode.todos.data.repositories.TaskNoteRepository;
-import org.zafritech.zscode.todos.data.repositories.TaskRepository;
-import org.zafritech.zscode.todos.data.repositories.TaskTagRepository;
-import org.zafritech.zscode.todos.enums.Priority;
-import org.zafritech.zscode.todos.enums.RepeatType;
 import org.zafritech.zscode.todos.services.DataLoaderService;
 import org.zafritech.zscode.todos.services.StateRegistryService;
 import org.zafritech.zscode.todos.services.TodosService;
-import org.zafritech.zscode.todos.utils.TimeUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -44,26 +29,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class DataLoaderServiceImpl implements DataLoaderService {
 
 	@Autowired
-    private TimeUtils timeUtils;
-	
-	@Autowired
     private CategoryRepository categoryRepository;
-	
-	@Autowired
-    private TagRepository tagRepository;
-	
-	@Autowired
-    private TaskRepository taskRepository;
-	
-	@Autowired
-    private TaskTagRepository taskTagRepository;
-	
-	@Autowired
-    private TaskNoteRepository taskNoteRepository;
-	
-	@Autowired
-    private RepeatRepository repeatRepository;
-	
+
     @Autowired
     private StateRegistryRepository stateRepository;
     
@@ -105,30 +72,6 @@ public class DataLoaderServiceImpl implements DataLoaderService {
 			logger.error(ex.getMessage());
 		}
 	}
-
-	@Override
-	public void initialiseTags(String dataFile, String dataKey) {
-
-		ObjectMapper mapper = new ObjectMapper();
-		
-		try {
-            
-            List<TagDao> objects = Arrays.asList(mapper.readValue(new File(dataFile), TagDao[].class));
-            
-            for (TagDao dao : objects) {
-            	
-            	Tag tag = tagRepository.save(new Tag(dao.getName()));
-        		logger.info("Initialised tag: " + tag.getName()); 
-            }
-        	
-    		stateRegistryService.activateState(dataKey);
-    		
-		} catch (IOException ex) {
-		    
-			logger.error(ex.getMessage());
-		}
-	
-	}
 	
 	@Override
 	public void initialiseTasks(String dataFile, String dataKey) throws ParseException {
@@ -141,59 +84,33 @@ public class DataLoaderServiceImpl implements DataLoaderService {
             
             for (TaskDao dao : objects) {
             	
-            	ZonedDateTime target = timeUtils.parseZonedDateTime(dao.getDue());  
+            	Task task = todosService.createTask(dao);
             	
-            	Repeat repeat = null;
-            	
-            	if (dao.getRepeat() != null) {
-            		
-            		ZonedDateTime start = timeUtils.parseZonedDateTime(dao.getRepeat().getStart()); 
-            		RepeatType type = RepeatType.valueOf(dao.getRepeat().getType());
-            		Integer count = dao.getRepeat().getCount();
-            		
-            		repeat = new Repeat(type, count, Date.from(start.toInstant())); 
-            		repeat = repeatRepository.save(repeat);
-            		
-            	}
-            	
-            	Task task = new Task(dao.getDetails());
-            	task.setCategory(categoryRepository.findFirstByNameIgnoreCase(dao.getCategory()));
-            	task.setPriority(Priority.valueOf(dao.getPriority())); 
-            	task.setDeadline(timeUtils.ZonedDateTimeToDate(target));
-            	task.setRepeat(repeat);
-        		task = taskRepository.save(task);
+            	if (!dao.getTags().isEmpty()) {
 
-        		if (!dao.getTags().isEmpty()) {
-        		
-        			List<TaskTag> tags = new ArrayList<>();
         			List<TagDao> tagDaos = dao.getTags();
         			
-        			for (TagDao tagDao : tagDaos) {
+        			for (TagDao tags : tagDaos) {
         				
-        				TaskTag taskTag = taskTagRepository.save(new TaskTag(task, tagDao.getName()));
-        				logger.info("\n\nSaved task tag: " + taskTag.getTag());
-        				tags.add(taskTag);
+        				todosService.addTag(task.getId(), tags.getName());
         			}
-        			
-	        		task.getTags().addAll(tags);
-	        		task = taskRepository.save(task);
-        		}
-        		
-        		if (!dao.getNotes().isEmpty()) {
+            	}
+            	
+            	if (!dao.getNotes().isEmpty()) {
             		
-        			List<TaskNote> notes = new ArrayList<>();
-        			List<TaskNoteDao> noteDaos = dao.getNotes();
-        			
-        			for (TaskNoteDao noteDao : noteDaos) {
-        			
-        				TaskNote taskNote = taskNoteRepository.save(new TaskNote(task, noteDao.getNote()));
-        				logger.info("\n\nSaved task note: " + taskNote.getNote()); 
-        				notes.add(taskNote);
-        			}
-        			
-        			task.getNotes().addAll(notes);
-	        		task = taskRepository.save(task);
-        		}
+            		List<TaskNoteDao> notes = dao.getNotes();
+            		
+            		for (TaskNoteDao note : notes) {
+            			
+            			todosService.addNote(task.getId(), note.getNote());
+            		}
+            	}
+            	
+            	if (dao.getCategory() != null) {
+            	
+            		Long categoryId = categoryRepository.findFirstByNameIgnoreCase(dao.getCategory()).getId();
+            		todosService.setCategory(task.getId(), categoryId);
+            	}
             	
         		logger.info("Initialised task: " + task.getDetails());  
             }
