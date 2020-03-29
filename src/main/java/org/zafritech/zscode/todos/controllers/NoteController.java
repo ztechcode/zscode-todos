@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import org.zafritech.zscode.commons.security.Identity;
 import org.zafritech.zscode.todos.data.daos.JsonNoteDao;
 import org.zafritech.zscode.todos.data.models.Note;
-import org.zafritech.zscode.todos.security.Identity;
 import org.zafritech.zscode.todos.services.NotesService;
 
 @RestController

@@ -5,10 +5,10 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.zafritech.zscode.commons.security.Identity;
 import org.zafritech.zscode.todos.data.daos.JsonNoteDao;
 import org.zafritech.zscode.todos.data.models.Note;
 import org.zafritech.zscode.todos.data.repositories.NoteRepository;
-import org.zafritech.zscode.todos.security.Identity;
 import org.zafritech.zscode.todos.services.NotesService;
 
 @Service
