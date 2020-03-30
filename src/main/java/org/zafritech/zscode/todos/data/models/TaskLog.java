@@ -13,13 +13,20 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter @Setter @ToString
 @Entity(name = "ZSCODE_TODOS_TASK_LOGS")
 public class TaskLog implements Serializable {
 
 	private static final long serialVersionUID = -3177895980900620157L;
 
-    @Id
+	@Id
     @GeneratedValue
+    @Setter(AccessLevel.PROTECTED)
     private Long id;
     
     private String uuid;
@@ -64,49 +71,4 @@ public class TaskLog implements Serializable {
 		this.completed = completed;
 		this.created = new Timestamp(System.currentTimeMillis());
 	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public String getUuid() {
-		return uuid;
-	}
-
-	public String getOwner() {
-		return owner;
-	}
-
-	public Task getTask() {
-		return task;
-	}
-
-	public Date getCompleted() {
-		return completed;
-	}
-
-	public Date getCreated() {
-		return created;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-
-	public void setOwner(String owner) {
-		this.owner = owner;
-	}
-
-	public void setTask(Task task) {
-		this.task = task;
-	}
-
-	public void setCompleted(Date completed) {
-		this.completed = completed;
-	}
-
-	public void setCreated(Date created) {
-		this.created = created;
-	}
-    
 }

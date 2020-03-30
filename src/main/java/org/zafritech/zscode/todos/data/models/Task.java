@@ -28,13 +28,20 @@ import org.zafritech.zscode.todos.enums.Priority;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter @Setter @ToString(exclude = {"category", "notes", "project", "tags"})
 @Entity(name = "ZSCODE_TODOS_TASKS")
 public class Task implements Serializable {
 
 	private static final long serialVersionUID = -5715371767694860756L;
 
-    @Id
+	@Id
     @GeneratedValue
+    @Setter(AccessLevel.PROTECTED)
     private Long id;
     
     private String uuid;
@@ -104,112 +111,5 @@ public class Task implements Serializable {
 		this.repeat = null;
 		this.deadline = deadline;
 		this.created = new Timestamp(System.currentTimeMillis());
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public String getUuid() {
-		return uuid;
-	}
-
-	public String getOwner() {
-		return owner;
-	}
-
-	public Task getParent() {
-		return parent;
-	}
-
-	public String getDetails() {
-		return details;
-	}
-
-	public Repeat getRepeat() {
-		return repeat;
-	}
-
-	public Priority getPriority() {
-		return priority;
-	}
-
-	public Category getCategory() {
-		return category;
-	}
-
-	public Project getProject() {
-		return project;
-	}
-
-	public List<TaskNote> getNotes() {
-		return notes;
-	}
-
-	public Date getCreated() {
-		return created;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-
-	public void setOwner(String owner) {
-		this.owner = owner;
-	}
-
-	public void setParent(Task parent) {
-		this.parent = parent;
-	}
-
-	public void setDetails(String details) {
-		this.details = details;
-	}
-
-	public void setRepeat(Repeat repeat) {
-		this.repeat = repeat;
-	}
-
-	public void setPriority(Priority priority) {
-		this.priority = priority;
-	}
-
-	public void setCategory(Category category) {
-		this.category = category;
-	}
-
-	public void setProject(Project project) {
-		this.project = project;
-	}
-
-	public void setNotes(List<TaskNote> notes) {
-		this.notes = notes;
-	}
-
-	public List<String> getTags() {
-		return tags;
-	}
-
-	public void setTags(List<String> tags) {
-		this.tags = tags;
-	}
-
-	public void setCreated(Date created) {
-		this.created = created;
-	}
-
-	public Date getDeadline() {
-		return deadline;
-	}
-
-	public void setDeadline(Date deadline) {
-		this.deadline = deadline;
-	}
-
-	@Override
-	public String toString() {
-		return "Task [id=" + id + ", uuid=" + uuid + ", owner=" + owner + ", parent=" + parent + ", details=" + details
-				+ ", repeat=" + repeat + ", priority=" + priority + ", category=" + category + ", project=" + project
-				+ ", notes=" + notes + ", tags=" + tags + ", deadline=" + deadline + ", created=" + created + "]";
 	}
 }

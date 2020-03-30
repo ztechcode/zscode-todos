@@ -6,8 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.zafritech.zscode.todos.data.models.StateRegistry;
-import org.zafritech.zscode.todos.data.repositories.StateRegistryRepository;
+import org.zafritech.zscode.commons.data.models.StateRegistry;
+import org.zafritech.zscode.commons.data.repositories.StateRegistryRepository;
 import org.zafritech.zscode.todos.services.StateRegistryService;
 
 @Service

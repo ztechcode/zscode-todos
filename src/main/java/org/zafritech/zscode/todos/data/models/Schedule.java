@@ -10,13 +10,20 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter @Setter @ToString
 @Entity(name = "ZSCODE_TODOS_SCHEDULES")
 public class Schedule implements Serializable {
 
 	private static final long serialVersionUID = -4361643559250891137L;
 
-    @Id
+	@Id
     @GeneratedValue
+    @Setter(AccessLevel.PROTECTED)
     private Long id;
     
     private String uuid;
@@ -50,55 +57,5 @@ public class Schedule implements Serializable {
 		this.deadline = deadline;
 		this.task = task;
 		this.done = false;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public String getUuid() {
-		return uuid;
-	}
-
-	public String getOwner() {
-		return owner;
-	}
-
-	public Task getTask() {
-		return task;
-	}
-
-	public boolean isDone() {
-		return done;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-
-	public void setOwner(String owner) {
-		this.owner = owner;
-	}
-
-	public void setTask(Task task) {
-		this.task = task;
-	}
-
-	public void setDone(boolean done) {
-		this.done = done;
-	}
-
-	public Date getDeadline() {
-		return deadline;
-	}
-
-	public void setDeadline(Date deadline) {
-		this.deadline = deadline;
-	}
-
-	@Override
-	public String toString() {
-		return "Schedule [id=" + id + ", uuid=" + uuid + ", owner=" + owner + ", deadline=" + deadline + ", task="
-				+ task + ", done=" + done + "]";
 	}
 }

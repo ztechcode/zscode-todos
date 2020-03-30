@@ -17,6 +17,12 @@ import javax.persistence.TemporalType;
 import org.zafritech.zscode.todos.data.converters.StringListConverter;
 import org.zafritech.zscode.todos.enums.RepeatType;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter @Setter @ToString
 @Entity(name = "ZSCODE_TODOS_REPEATS")
 public class Repeat implements Serializable {
 
@@ -24,6 +30,7 @@ public class Repeat implements Serializable {
 
 	@Id
     @GeneratedValue
+    @Setter(AccessLevel.PROTECTED)
     private Long id;
     
     private String uuid;
@@ -52,63 +59,5 @@ public class Repeat implements Serializable {
 		this.type = type;
 		this.count = count;
 		this.start = start;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public String getUuid() {
-		return uuid;
-	}
-
-	public RepeatType getType() {
-		return type;
-	}
-
-	public Integer getCount() {
-		return count;
-	}
-
-	public Date getStart() {
-		return start;
-	}
-
-	public Date getLast() {
-		return last;
-	}
-
-	public List<String> getDays() {
-		return days;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-
-	public void setType(RepeatType type) {
-		this.type = type;
-	}
-
-	public void setCount(Integer count) {
-		this.count = count;
-	}
-
-	public void setStart(Date start) {
-		this.start = start;
-	}
-
-	public void setLast(Date last) {
-		this.last = last;
-	}
-
-	public void setDays(List<String> days) {
-		this.days = days;
-	}
-
-	@Override
-	public String toString() {
-		return "Repeat [id=" + id + ", uuid=" + uuid + ", type=" + type + ", count=" + count + ", start=" + start
-				+ ", last=" + last + ", days=" + days + "]";
 	}
 }

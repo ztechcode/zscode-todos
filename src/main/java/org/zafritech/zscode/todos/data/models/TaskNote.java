@@ -17,6 +17,12 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter @Setter @ToString
 @Entity(name = "ZSCODE_TODOS_TASK_NOTES")
 public class TaskNote implements Serializable {
 
@@ -24,6 +30,7 @@ public class TaskNote implements Serializable {
 
 	@Id
     @GeneratedValue
+    @Setter(AccessLevel.PROTECTED)
     private Long id;
     
     private String uuid;
@@ -50,47 +57,5 @@ public class TaskNote implements Serializable {
 		this.task = task;
 		this.note = note;
 		this.created = new Timestamp(System.currentTimeMillis());
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public String getUuid() {
-		return uuid;
-	}
-
-	public Task getTask() {
-		return task;
-	}
-
-	public String getNote() {
-		return note;
-	}
-
-	public Date getCreated() {
-		return created;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-
-	public void setTask(Task task) {
-		this.task = task;
-	}
-
-	public void setNote(String note) {
-		this.note = note;
-	}
-
-	public void setCreated(Date created) {
-		this.created = created;
-	}
-
-	@Override
-	public String toString() {
-		return "TaskNote [id=" + id + ", uuid=" + uuid + ", task=" + task + ", note=" + note + ", created=" + created
-				+ "]";
 	}
 }
