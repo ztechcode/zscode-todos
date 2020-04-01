@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-import org.zafritech.zscode.commons.security.Identity;
+import org.zafritech.zscode.commons.services.Authentication;
 import org.zafritech.zscode.todos.data.daos.JsonNoteDao;
 import org.zafritech.zscode.todos.data.models.Note;
 import org.zafritech.zscode.todos.services.NotesService;
@@ -24,7 +24,7 @@ import org.zafritech.zscode.todos.services.NotesService;
 public class NoteController {
 
 	@Autowired
-	private Identity identity;
+	private Authentication identity;
 
 	@Autowired
 	private NotesService notesService;
@@ -40,7 +40,7 @@ public class NoteController {
 	@RequestMapping(value = "/apikey", method = RequestMethod.GET)
 	public ResponseEntity<String> getApiKey(@RequestHeader (name="Authorization") String bearerToken) {
 		
-		String apiKey = identity.getApiKey(bearerToken);
+		String apiKey = identity.apiKey(bearerToken);
 		
 		return new ResponseEntity<>(apiKey, HttpStatus.OK);		
 	}

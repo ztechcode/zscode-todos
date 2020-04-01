@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.zafritech.zscode.commons.security.Identity;
+import org.zafritech.zscode.commons.services.Authentication;
 import org.zafritech.zscode.todos.data.daos.JsonNoteDao;
 import org.zafritech.zscode.todos.data.models.Note;
 import org.zafritech.zscode.todos.data.repositories.NoteRepository;
@@ -15,7 +15,7 @@ import org.zafritech.zscode.todos.services.NotesService;
 public class NotesServiceImpl implements NotesService {
 
 	@Autowired
-	private Identity identity;
+	private Authentication identity;
 
 	@Autowired
 	private NoteRepository noteRepository;
@@ -24,7 +24,7 @@ public class NotesServiceImpl implements NotesService {
 	public List<Note> fetchAllNotes(String token) {
 		
 		List<Note> notes = new ArrayList<>();
-		String apiKey = identity.getApiKey(token);
+		String apiKey = identity.apiKey(token);
 		
 		if (apiKey != null) {
 		
@@ -50,7 +50,7 @@ public class NotesServiceImpl implements NotesService {
 	@Override
 	public Note createNote(String token, JsonNoteDao dao) {
 
-		String apiKey = identity.getApiKey(token);
+		String apiKey = identity.apiKey(token);
 		
 		if (apiKey != null) {
 			
@@ -94,7 +94,7 @@ public class NotesServiceImpl implements NotesService {
 
 	private boolean userAuthorised(String token, Long id) {
 
-		String apiKey = identity.getApiKey(token);
+		String apiKey = identity.apiKey(token);
 		Note note = noteRepository.findById(id).orElse(null);
 		
 		if (note != null && apiKey.equals(note.getOwner())) {
