@@ -22,6 +22,4 @@ public class StringListConverter implements AttributeConverter<List<String>, Str
 
 		return Arrays.asList(string.split(SPLIT_CHAR));
 	}
-	
-
 }

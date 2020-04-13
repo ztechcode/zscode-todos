@@ -29,6 +29,11 @@
         	<artifactId>zscode-commons</artifactId>
         	<version>1.0.1-SNAPSHOT</version>
         </dependency>
+		<dependency>
+        	<groupId>org.zafritech</groupId>
+        	<artifactId>zscode-commons</artifactId>
+        	<version>1.0.1-SNAPSHOT</version>
+        </dependency>
         <dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
