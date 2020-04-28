@@ -10,8 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.zafritech.zscode.commons.data.daos.SystemLoginDao;
+import org.zafritech.zscode.commons.data.daos.SystemSignupDao;
 import org.zafritech.zscode.commons.data.models.StateRegistry;
 import org.zafritech.zscode.commons.data.repositories.StateRegistryRepository;
+import org.zafritech.zscode.commons.enums.ClientType;
 import org.zafritech.zscode.commons.services.Authentication;
 import org.zafritech.zscode.commons.services.FileService;
 import org.zafritech.zscode.commons.services.impl.StateImpl;
@@ -26,6 +28,7 @@ import org.zafritech.zscode.todos.data.repositories.CategoryRepository;
 import org.zafritech.zscode.todos.services.DataLoaderService;
 import org.zafritech.zscode.todos.services.TodosService;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
@@ -54,6 +57,32 @@ public class DataLoaderServiceImpl implements DataLoaderService {
 
 	private static final Logger logger = LoggerFactory.getLogger(DataLoaderServiceImpl.class);
 
+	@Override
+	public void registerSystemUser(String dataKey) throws JsonProcessingException {
+
+		String registerUrl = props.getUrls().getAuthApi() + "register";
+
+		// Request body parameters
+		SystemSignupDao body = new SystemSignupDao();
+		body.setEmail(props.getApp().getEmail().trim());
+		body.setPassword(props.getApp().getPassword().trim());
+		body.setConfirmPassword(props.getApp().getPassword().trim());
+		body.setFirstName(props.getApp().getName().trim());
+		body.setLastName(props.getApp().getSuffix().trim());
+		body.setType(ClientType.SYSTEM);
+
+		commons.registerState(dataKey);
+		
+		if (identity.registerSystemUser(body, registerUrl)) {
+			
+			logger.info("Registration successfull...");
+			
+		} else {
+			
+			logger.error("Registration failed...");
+		}
+	}
+	
 	@Override
 	public boolean isInitialised(String dataKey) {
 

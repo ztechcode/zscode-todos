@@ -16,6 +16,14 @@ public class TodosStartCLR implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 
+		if (!dataLoader.isInitialised("TODOS_SYSTEM_USER_INIT")) {
+
+			dataLoader.registerSystemUser("TODOS_SYSTEM_USER_INIT"); 
+		}
+
+		// Allow 5 seconds delay
+		Thread.sleep(5000);
+		
 		if (!dataLoader.isInitialised("TODOS_CATEGORIES_INIT")) { 
 			
 			dataLoader.initialiseCategories("TODOS_CATEGORIES_INIT"); 
