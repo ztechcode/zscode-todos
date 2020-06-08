@@ -69,7 +69,7 @@ public class DataLoaderServiceImpl implements DataLoaderService {
 		body.setConfirmPassword(props.getApp().getPassword().trim());
 		body.setFirstName(props.getApp().getName().trim());
 		body.setLastName(props.getApp().getSuffix().trim());
-		body.setType(ClientType.SYSTEM);
+		body.setType(ClientType.SERVICE);
 
 		commons.registerState(dataKey);
 		
